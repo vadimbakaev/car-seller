@@ -1,5 +1,7 @@
 package controllers
 
+import mappers.CarRequest2CarInfo
+import models.commands.Command
 import org.scalatest.concurrent.ScalaFutures
 import play.api.http.ContentTypes
 import play.api.libs.json.{JsObject, Json}
@@ -7,6 +9,7 @@ import play.api.mvc.Result
 import play.api.test.FakeRequest
 import play.api.test.Helpers.{status, stubControllerComponents, _}
 import play.mvc.Http.HeaderNames
+import services.CommandHandler
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -15,7 +18,9 @@ class AddCarControllerTest extends ControllerBaseSpec with ScalaFutures {
   trait Fixture {
     implicit val ec: ExecutionContext = inject[ExecutionContext]
 
-    val controller = new AddCarController(stubControllerComponents())
+    val commandHandler: CommandHandler = (command: Command) => ???
+
+    val controller = new AddCarController(stubControllerComponents(), new CarRequest2CarInfo(), commandHandler)
   }
 
   "AddCarController POST" should {
