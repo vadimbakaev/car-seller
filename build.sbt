@@ -9,14 +9,18 @@ scalaVersion := "2.12.8"
 
 libraryDependencies ++= {
   object Version {
-    val scalaTest = "4.0.1"
-    val playJson = "2.7.2"
+    val scalaTest    = "4.0.1"
+    val playJson     = "2.7.2"
+    val mongo        = "2.6.0"
+    val mockitoScala = "1.2.2"
   }
 
   Seq(
     ws,
     guice,
-    "com.typesafe.play" %% "play-json" % Version.playJson,
+    "org.mongodb.scala"      %% "mongo-scala-driver" % Version.mongo,
+    "com.typesafe.play"      %% "play-json"          % Version.playJson,
+    "org.mockito"            %% "mockito-scala"      % Version.mockitoScala % Test,
     "org.scalatestplus.play" %% "scalatestplus-play" % Version.scalaTest % Test
   )
 }

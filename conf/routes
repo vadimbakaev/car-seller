@@ -5,3 +5,5 @@
 
 # An example controller showing a sample home page
 GET     /status                           controllers.StatusController.status
+
+POST    /public/v1/car                    controllers.CarController.add
