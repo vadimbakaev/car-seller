@@ -2,17 +2,18 @@ package controllers
 
 import javax.inject._
 import mappers.CarRequest2CarInfo
-import models.commands.{AddCarCommand, ErrorResult, FailedResult, SuccessResult}
+import models.commands.{AddCarCommand, AddCarResult, FailedResult}
 import models.request.CarRequest
 import play.api.Logging
-import play.api.libs.json.{JsError, JsValue, Json}
+import play.api.libs.json.{JsError, JsValue}
 import play.api.mvc._
+import play.mvc.Http.HeaderNames
 import services.CommandHandler
 
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class AddCarController @Inject()(
+class CarController @Inject()(
     cc: ControllerComponents,
     mapper: CarRequest2CarInfo,
     commandHandler: CommandHandler
@@ -27,9 +28,8 @@ class AddCarController @Inject()(
         invalid => Future(BadRequest(JsError.toJson(invalid))),
         valid =>
           commandHandler.handle(AddCarCommand(mapper(valid))).map {
-            case SuccessResult => Created(Json.obj("status"             -> "ok"))
-            case FailedResult  => Conflict(Json.obj("status"            -> "ko"))
-            case ErrorResult   => InternalServerError(Json.obj("status" -> "ko"))
+            case AddCarResult(id) => Created.withHeaders(HeaderNames.LOCATION -> s"/public/v1/car/$id")
+            case FailedResult     => Conflict
         }
       )
   }

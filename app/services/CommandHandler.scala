@@ -1,7 +1,7 @@
 package services
 
 import com.google.inject.{ImplementedBy, Inject, Singleton}
-import models.commands.{AddCarCommand, Command, CommandResult, ErrorResult, FailedResult, SuccessResult}
+import models.commands.{AddCarCommand, AddCarResult, Command, CommandResult, FailedResult}
 import play.api.Logging
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -24,13 +24,8 @@ class CommandHandlerImpl @Inject()(
       repository
         .create(car)
         .map {
-          case Some(_) => SuccessResult
-          case _       => FailedResult
-        }
-        .recover {
-          case t =>
-            logger.error("Unable to create car", t)
-            ErrorResult
+          case Some(carInfo) => AddCarResult(carInfo.id.toString)
+          case _             => FailedResult
         }
   }
 }

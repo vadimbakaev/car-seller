@@ -19,6 +19,7 @@ final case class CarRequest(
 
 object CarRequest {
 
+  implicit val writes: Writes[CarRequest] = Json.format
   implicit val reads: Reads[CarRequest] = {
     val newRead: Reads[Boolean] = (__ \ "new").read[Boolean]
 
