@@ -61,11 +61,11 @@ class MongoCarInfoRepository @Inject()(
       .map(_ => collection)
   }
 
-  override def create(model: CarInfo): Future[CarInfo] = collectionF.flatMap { collection =>
-    collection.insertOne(model).toFuture.map(_ => model).recover {
-      case t @ _ =>
-        logger.error("Fail to save car", t)
-        throw t
+  override def create(model: CarInfo): Future[Option[CarInfo]] = collectionF.flatMap { collection =>
+    collection.insertOne(model).toFuture.map(_ => Some(model)).recover {
+      case e: com.mongodb.DuplicateKeyException =>
+        logger.warn("Duplicated key", e)
+        None
     }
   }
 

@@ -7,7 +7,7 @@ import scala.language.higherKinds
 
 trait Repository[F[_], T] {
 
-  def create(model: T): F[T]
+  def create(model: T): F[Option[T]]
 
   def getById(uuid: UUID): F[Option[T]]
 
