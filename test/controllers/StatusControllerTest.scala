@@ -3,18 +3,15 @@ package controllers
 import java.time.{Clock, Instant, ZoneId}
 
 import models.response.StatusResponse
-import org.scalatest.ParallelTestExecution
-import org.scalatestplus.play.PlaySpec
-import org.scalatestplus.play.guice.GuiceOneAppPerTest
 import play.api.http.ContentTypes
 import play.api.libs.json.JsSuccess
 import play.api.mvc.Result
+import play.api.test.FakeRequest
 import play.api.test.Helpers.{status, stubControllerComponents, _}
-import play.api.test.{FakeRequest, Injecting}
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class StatusControllerTest extends PlaySpec with GuiceOneAppPerTest with Injecting with ParallelTestExecution {
+class StatusControllerTest extends ControllerBaseSpec {
 
   trait Fixture {
     val instant: Instant = Instant.now()
