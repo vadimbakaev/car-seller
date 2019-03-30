@@ -8,42 +8,40 @@ import org.scalatestplus.play.PlaySpec
 import org.scalatestplus.play.guice.GuiceOneAppPerTest
 import play.api.http.ContentTypes
 import play.api.libs.json.JsSuccess
+import play.api.mvc.Result
 import play.api.test.Helpers.{status, stubControllerComponents, _}
 import play.api.test.{FakeRequest, Injecting}
 
-import scala.concurrent.ExecutionContext
+import scala.concurrent.{ExecutionContext, Future}
 
 class StatusControllerTest extends PlaySpec with GuiceOneAppPerTest with Injecting with ParallelTestExecution {
 
+  trait Fixture {
+    val instant: Instant = Instant.now()
+
+    implicit val clock: Clock         = Clock.fixed(instant, ZoneId.of("UTC"))
+    implicit val ec: ExecutionContext = inject[ExecutionContext]
+
+    val controller = new StatusController(stubControllerComponents())
+  }
+
   "StatusController GET" should {
-    "return status response with application start instance" in {
-      val instant = Instant.now()
-
-      implicit val clock: Clock         = Clock.fixed(instant, ZoneId.of("UTC"))
-      implicit val ec: ExecutionContext = inject[ExecutionContext]
-
-      val controller     = new StatusController(stubControllerComponents())
-      val statusResponse = controller.status.apply(FakeRequest(GET, "/status"))
+    "return status response with application start instance" in new Fixture {
+      val statusResponse: Future[Result] = controller.status.apply(FakeRequest(GET, "/status"))
 
       status(statusResponse) mustBe OK
       contentType(statusResponse) mustBe Some(ContentTypes.JSON)
       contentAsJson(statusResponse).validate[StatusResponse] mustBe JsSuccess(StatusResponse(instant))
     }
 
-    "always return the same status" in {
-      val instant = Instant.now()
-
-      implicit val clock: Clock         = Clock.fixed(instant, ZoneId.of("UTC"))
-      implicit val ec: ExecutionContext = inject[ExecutionContext]
-
-      val controller      = new StatusController(stubControllerComponents())
-      val statusResponse1 = controller.status.apply(FakeRequest(GET, "/status"))
-      val statusResponse2 = controller.status.apply(FakeRequest(GET, "/status"))
+    "always return the same status" in new Fixture {
+      val statusResponse1: Future[Result] = controller.status.apply(FakeRequest(GET, "/status"))
+      val statusResponse2: Future[Result] = controller.status.apply(FakeRequest(GET, "/status"))
 
       status(statusResponse1) mustBe status(statusResponse2)
       contentType(statusResponse1) mustBe contentType(statusResponse2)
       contentAsJson(statusResponse1) mustBe contentAsJson(statusResponse2)
     }
-
   }
+
 }
