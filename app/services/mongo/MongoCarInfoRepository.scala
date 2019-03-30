@@ -3,7 +3,7 @@ package services.mongo
 import java.util.UUID
 
 import com.google.inject.{Inject, Singleton}
-import com.mongodb.ConnectionString
+import com.mongodb.{ConnectionString, DuplicateKeyException, MongoWriteException}
 import models.CarInfo
 import org.bson.codecs.configuration.CodecProvider
 import org.bson.codecs.configuration.CodecRegistries.{fromProviders, fromRegistries}
@@ -16,6 +16,7 @@ import services.CarInfoRepository
 
 import scala.collection.immutable
 import scala.concurrent.{ExecutionContext, Future}
+import MongoCarInfoRepository._
 
 @Singleton
 class MongoCarInfoRepository @Inject()(
@@ -23,8 +24,6 @@ class MongoCarInfoRepository @Inject()(
 )(implicit ec: ExecutionContext)
     extends CarInfoRepository
     with Logging {
-
-  import MongoCarInfoRepository._
 
   private lazy val mongodbURI     = config.get[String](Uri)
   private lazy val databaseName   = config.get[String](Db)
@@ -63,18 +62,17 @@ class MongoCarInfoRepository @Inject()(
 
   override def create(model: CarInfo): Future[Option[CarInfo]] = collectionF.flatMap { collection =>
     collection.insertOne(model).toFuture.map(_ => Some(model)).recover {
-      case e: com.mongodb.DuplicateKeyException =>
-        logger.warn("Duplicated key", e)
+      case dke: DuplicateKeyException =>
+        logger.warn("Duplicated key", dke)
+        None
+      case mwe: MongoWriteException if mwe.getMessage.startsWith(DuplicateKeyCode) =>
+        logger.warn("Duplicated key", mwe)
         None
     }
   }
 
   override def getById(id: UUID): Future[Option[CarInfo]] = collectionF.flatMap { collection =>
-    collection.find[CarInfo](Filters.eq("id", id)).toFuture().map(_.headOption).recover {
-      case t @ _ =>
-        logger.error(s"Fail to get car by Id $id", t)
-        throw t
-    }
+    collection.find[CarInfo](Filters.eq("id", id)).toFuture().map(_.headOption)
   }
 
   override def update(model: CarInfo): Future[Option[CarInfo]] = ???
@@ -89,4 +87,6 @@ object MongoCarInfoRepository {
   val Uri            = "services.mongo.uri"
   val Db             = "services.mongo.database"
   val CollectionName = "services.mongo.collection"
+
+  val DuplicateKeyCode = "E11000"
 }
