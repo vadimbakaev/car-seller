@@ -3,7 +3,7 @@ package models.external.response
 import java.time.LocalDate
 import java.util.UUID
 
-import models.external.FuelType.FuelType
+import models.external.FuelType
 import play.api.libs.json.{Format, Json}
 
 final case class CarResponse(

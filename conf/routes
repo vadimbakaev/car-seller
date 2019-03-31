@@ -10,3 +10,4 @@ POST    /public/v1/cars                   controllers.CarController.add
 PUT     /public/v1/cars                   controllers.CarController.update
 GET     /public/v1/cars/:id               controllers.CarController.get(id: String)
 DELETE  /public/v1/cars/:id               controllers.CarController.delete(id: String)
+GET     /public/v1/cars                   controllers.CarController.getAll(sort: String ?= "id", desc: Boolean ?= false)

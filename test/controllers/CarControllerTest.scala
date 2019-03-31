@@ -6,19 +6,18 @@ import java.util.UUID
 import controllers.CarControllerTest._
 import mappers.{CarInfo2CarResponse, CarRequest2CarInfo}
 import models.CarInfo
-import models.commands._
 import models.external.FuelType
 import models.external.request.CarRequest
 import org.mockito.{ArgumentMatchersSugar, MockitoSugar}
 import org.scalatest.ParallelTestExecution
 import org.scalatest.concurrent.ScalaFutures
 import play.api.http.ContentTypes
-import play.api.libs.json.{JsValue, Json}
+import play.api.libs.json.{JsObject, JsValue, Json}
 import play.api.mvc.{AnyContent, Result}
 import play.api.test.FakeRequest
 import play.api.test.Helpers.{status, stubControllerComponents, _}
 import play.mvc.Http.HeaderNames
-import services.CommandHandler
+import services.{CarService, SortKey}
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -30,12 +29,12 @@ class CarControllerTest
     with ParallelTestExecution {
 
   trait Fixture {
-    implicit val ec: ExecutionContext  = inject[ExecutionContext]
-    val commandHandler: CommandHandler = mock[CommandHandler]
+    implicit val ec: ExecutionContext = inject[ExecutionContext]
+    val carService: CarService        = mock[CarService]
 
     val internal   = new CarRequest2CarInfo()
     val external   = new CarInfo2CarResponse()
-    val controller = new CarController(stubControllerComponents(), internal, external, commandHandler)
+    val controller = new CarController(stubControllerComponents(), internal, external, carService)
 
     def createJsValueRequest(method: String, body: JsValue): FakeRequest[JsValue] =
       FakeRequest(method, "/public/v1/cars")
@@ -46,27 +45,27 @@ class CarControllerTest
       FakeRequest(method, s"/public/v1/cars/$id")
 
     def executePostRequest(body: JsValue): Future[Result] =
-      controller.add.apply(createJsValueRequest(POST, body))
+      controller.add(createJsValueRequest(POST, body))
 
     def executeGetRequest(id: String): Future[Result] =
-      controller.get(id).apply(createAnyContentRequest(GET, id))
+      controller.get(id)(createAnyContentRequest(GET, id))
 
     def executeDeleteRequest(id: String): Future[Result] =
-      controller.get(id).apply(createAnyContentRequest(DELETE, id))
+      controller.delete(id)(createAnyContentRequest(DELETE, id))
 
     def executePutRequest(body: JsValue): Future[Result] =
-      controller.update.apply(createJsValueRequest(PUT, body))
+      controller.update(createJsValueRequest(PUT, body))
   }
 
-  "CarController POST" should {
-    "on add return BadRequest when request is invalid, empty json" in new Fixture {
+  "CarController" should {
+    "on add return Bad Request when request is invalid, empty json" in new Fixture {
       val body: JsValue                  = Json.obj()
       val addCarResponse: Future[Result] = executePostRequest(body)
 
       status(addCarResponse) mustBe BAD_REQUEST
     }
 
-    "on add return BadRequest when request is invalid" in new Fixture {
+    "on add return Bad Request when request is invalid" in new Fixture {
       val body: JsValue                  = Json.toJson(InvalidCarRequest)
       val addCarResponse: Future[Result] = executePostRequest(body)
 
@@ -78,18 +77,18 @@ class CarControllerTest
     }
 
     "on add return Conflict when car already created" in new Fixture {
-      when(commandHandler.handle(*[CreateCarCommand])).thenReturn(Future.successful(CarResult(None)))
+      when(carService.create(*)).thenReturn(Future.successful(None))
 
       val body: JsValue                  = Json.toJson(ValidCarRequest)
       val addCarResponse: Future[Result] = executePostRequest(body)
 
       status(addCarResponse) mustBe CONFLICT
 
-      verify(commandHandler, times(1)).handle(*)
+      verify(carService, times(1)).create(*)
     }
 
     "on add return Created" in new Fixture {
-      when(commandHandler.handle(*[CreateCarCommand])).thenReturn(Future.successful(CarResult(Some(AudiCarInfo))))
+      when(carService.create(*)).thenReturn(Future.successful(Some(AudiCarInfo)))
 
       val body: JsValue                  = Json.toJson(ValidCarRequest)
       val addCarResponse: Future[Result] = executePostRequest(body)
@@ -97,7 +96,7 @@ class CarControllerTest
       status(addCarResponse) mustBe CREATED
       header(HeaderNames.LOCATION, addCarResponse) mustBe Some(s"/public/v1/cars/$AudiId")
 
-      verify(commandHandler, times(1)).handle(*)
+      verify(carService, times(1)).create(*)
     }
 
     "on get return Not Found when id is invalid" in new Fixture {
@@ -106,34 +105,27 @@ class CarControllerTest
       val getCarResponse: Future[Result] = executeGetRequest(id)
 
       status(getCarResponse) mustBe NOT_FOUND
-      verify(commandHandler, times(0)).handle(*)
     }
 
-    "on get return Not Found when commandHandler doesn't return car" in new Fixture {
-      when(commandHandler.handle(*[ReadCarCommand])).thenReturn(Future.successful(CarResult(None)))
+    "on get return Not Found when carService doesn't return car" in new Fixture {
+      when(carService.read(*)).thenReturn(Future.successful(None))
 
       val getCarResponse: Future[Result] = executeGetRequest(AudiId)
 
       status(getCarResponse) mustBe NOT_FOUND
 
-      verify(commandHandler, times(1)).handle(*)
+      verify(carService, times(1)).read(*)
     }
 
     "on get return Ok with json body" in new Fixture {
-      when(commandHandler.handle(*[ReadCarCommand])).thenReturn(Future.successful(CarResult(Some(AudiCarInfo))))
+      when(carService.read(*)).thenReturn(Future.successful(Some(AudiCarInfo)))
 
       val getCarResponse: Future[Result] = executeGetRequest(AudiId)
 
       status(getCarResponse) mustBe OK
-      contentAsJson(getCarResponse) mustBe Json.obj(
-        "id"    -> AudiCarInfo.id,
-        "title" -> AudiCarInfo.title,
-        "fuel"  -> FuelType.Diesel.toString,
-        "price" -> AudiCarInfo.price,
-        "new"   -> AudiCarInfo.isNew
-      )
+      contentAsJson(getCarResponse) mustBe AudiJsonResponse
 
-      verify(commandHandler, times(1)).handle(*)
+      verify(carService, times(1)).read(*)
     }
 
     "on delete return Not Found when id is invalid" in new Fixture {
@@ -142,60 +134,75 @@ class CarControllerTest
       val deleteCarResponse: Future[Result] = executeDeleteRequest(id)
 
       status(deleteCarResponse) mustBe NOT_FOUND
-
-      verify(commandHandler, times(0)).handle(*)
     }
 
-    "on delete return Not Found when commandHandler doesn't return car" in new Fixture {
-      when(commandHandler.handle(*[DeleteCarCommand])).thenReturn(Future.successful(CarResult(None)))
+    "on delete return Not Found when carService doesn't return car" in new Fixture {
+      when(carService.delete(*)).thenReturn(Future.successful(None))
 
       val deleteCarResponse: Future[Result] = executeDeleteRequest(AudiId)
 
       status(deleteCarResponse) mustBe NOT_FOUND
 
-      verify(commandHandler, times(1)).handle(*)
+      verify(carService, times(1)).delete(*)
     }
 
     "on delete return Ok with json body" in new Fixture {
-      when(commandHandler.handle(*[DeleteCarCommand])).thenReturn(Future.successful(CarResult(Some(OpelCarInfo))))
+      when(carService.delete(*)).thenReturn(Future.successful(Some(OpelCarInfo)))
 
       val deleteCarResponse: Future[Result] = executeDeleteRequest(OpelId)
 
       status(deleteCarResponse) mustBe OK
-      contentAsJson(deleteCarResponse) mustBe Json.obj(
-        "id"           -> OpelCarInfo.id,
-        "title"        -> OpelCarInfo.title,
-        "fuel"         -> FuelType.Gasoline.toString,
-        "price"        -> OpelCarInfo.price,
-        "new"          -> OpelCarInfo.isNew,
-        "mileage"      -> 99000,
-        "registration" -> "2000-01-07",
-      )
+      contentAsJson(deleteCarResponse) mustBe OpelJsonResponse
 
-      verify(commandHandler, times(1)).handle(*)
+      verify(carService, times(1)).delete(*)
     }
 
-    "on update return Not Found commandHandler doesn't return car" in new Fixture {
-      when(commandHandler.handle(*[UpdateCarCommand])).thenReturn(Future.successful(CarResult(None)))
+    "on update return Not Found carService doesn't return car" in new Fixture {
+      when(carService.update(*)).thenReturn(Future.successful(None))
 
       val body: JsValue                     = Json.toJson(ValidCarRequest)
       val updateCarResponse: Future[Result] = executePutRequest(body)
 
       status(updateCarResponse) mustBe NOT_FOUND
 
-      verify(commandHandler, times(1)).handle(*)
+      verify(carService, times(1)).update(*)
     }
 
-    "on update return No Content whe commandHandler returns car" in new Fixture {
-      when(commandHandler.handle(*[UpdateCarCommand])).thenReturn(Future.successful(CarResult(Some(AudiCarInfo))))
+    "on update return No Content whe carService returns car" in new Fixture {
+      when(carService.update(*)).thenReturn(Future.successful(Some(AudiCarInfo)))
 
       val body: JsValue                     = Json.toJson(ValidCarRequest)
       val updateCarResponse: Future[Result] = executePutRequest(body)
 
       status(updateCarResponse) mustBe NO_CONTENT
 
-      verify(commandHandler, times(1)).handle(*)
+      verify(carService, times(1)).update(*)
     }
+
+    "on getAll return Bad Request when sortKy is invalid" in new Fixture {
+      val key = "wrongKey"
+      val getAllResponse: Future[Result] =
+        controller.getAll(key, desc = false)(FakeRequest(GET, s"/public/v1/cars?sort=$key"))
+
+      status(getAllResponse) mustBe BAD_REQUEST
+
+      verify(carService, times(0)).readAll(*, *)
+    }
+
+    "on getAll return Ok" in new Fixture {
+      when(carService.readAll(SortKey.Title, desc = true)).thenReturn(Future.successful(List(AudiCarInfo)))
+
+      val key = "title"
+      val getAllResponse: Future[Result] =
+        controller.getAll(key, desc = true)(FakeRequest(GET, s"/public/v1/cars?sort=$key&desc=${true}"))
+
+      status(getAllResponse) mustBe OK
+
+      contentAsJson(getAllResponse) mustBe Json.obj("cars" -> Json.arr(AudiJsonResponse))
+
+      verify(carService, times(1)).readAll(*, *)
+    }
+
   }
 }
 
@@ -223,4 +230,21 @@ object CarControllerTest {
     Some(99000),
     Some(LocalDate.of(2000, 1, 7))
   )
+  val AudiJsonResponse: JsObject = Json.obj(
+    "id"    -> AudiCarInfo.id,
+    "title" -> AudiCarInfo.title,
+    "fuel"  -> FuelType.Diesel.entryName,
+    "price" -> AudiCarInfo.price,
+    "new"   -> AudiCarInfo.isNew
+  )
+  val OpelJsonResponse: JsObject = Json.obj(
+    "id"           -> OpelCarInfo.id,
+    "title"        -> OpelCarInfo.title,
+    "fuel"         -> FuelType.Gasoline.entryName,
+    "price"        -> OpelCarInfo.price,
+    "new"          -> OpelCarInfo.isNew,
+    "mileage"      -> 99000,
+    "registration" -> "2000-01-07",
+  )
+
 }

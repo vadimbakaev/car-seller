@@ -3,7 +3,7 @@ package models.external.request
 import java.time.LocalDate
 import java.util.UUID
 
-import models.external.FuelType.FuelType
+import models.external.FuelType
 import play.api.libs.functional.syntax._
 import play.api.libs.json.{JsPath, Reads, _}
 
