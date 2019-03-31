@@ -4,6 +4,8 @@ import java.util.UUID
 
 import models.CarInfo
 
+import scala.collection.immutable
+
 sealed trait Command
 
 final case class CreateCarCommand(car: CarInfo) extends Command
@@ -14,6 +16,10 @@ final case class UpdateCarCommand(car: CarInfo) extends Command
 
 final case class DeleteCarCommand(id: UUID) extends Command
 
+final case class ReadAllCommand(criteria: Option[String], desc: Option[Boolean]) extends Command
+
 sealed trait CommandResult
 
-final case class CarResult(carInfo: Option[CarInfo]) extends CommandResult
+final case class CarResult(car: Option[CarInfo]) extends CommandResult
+
+final case class AllCarResult(cars: immutable.Seq[CarInfo]) extends CommandResult

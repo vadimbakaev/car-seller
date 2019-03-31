@@ -24,5 +24,7 @@ class CommandHandlerImpl @Inject()(
     case UpdateCarCommand(car) => repository.update(car).map(CarResult)
     case ReadCarCommand(id)    => repository.getById(id).map(CarResult)
     case DeleteCarCommand(id)  => repository.deleteById(id).map(CarResult)
+    case ReadAllCommand(maybeCriteria, desc) =>
+      repository.getAll(maybeCriteria.getOrElse("id"), desc.exists(identity)).map(AllCarResult)
   }
 }

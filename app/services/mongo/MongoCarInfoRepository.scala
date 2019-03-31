@@ -9,7 +9,7 @@ import org.bson.codecs.configuration.CodecRegistries.{fromProviders, fromRegistr
 import org.mongodb.scala.bson.codecs.DEFAULT_CODEC_REGISTRY
 import org.mongodb.scala.bson.codecs.Macros._
 import org.mongodb.scala.connection.ClusterSettings
-import org.mongodb.scala.model.{Filters, IndexOptions, Indexes}
+import org.mongodb.scala.model.{Filters, IndexOptions, Indexes, Sorts}
 import org.mongodb.scala.{MongoClient, MongoClientSettings, MongoCollection, MongoDatabase}
 import play.api.{Configuration, Logging}
 import services.CarInfoRepository
@@ -81,7 +81,14 @@ class MongoCarInfoRepository @Inject()(
     collection.findOneAndDelete(Filters.eq("id", id)).toFutureOption()
   }
 
-  override def getAll(criteria: String, desk: Boolean): Future[immutable.Seq[CarInfo]] = ???
+  override def getAll(criteria: String, desc: Boolean): Future[immutable.Seq[CarInfo]] = collectionF.flatMap {
+    collection =>
+      collection
+        .find()
+        .sort(if (desc) Sorts.descending(criteria) else Sorts.ascending(criteria))
+        .toFuture()
+        .map(_.toList)
+  }
 
 }
 

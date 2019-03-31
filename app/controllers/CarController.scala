@@ -6,6 +6,7 @@ import javax.inject._
 import mappers.{CarInfo2CarResponse, CarRequest2CarInfo}
 import models.commands._
 import models.external.request.CarRequest
+import models.external.response.AllCarsResponse
 import play.api.Logging
 import play.api.libs.json.{JsError, JsValue, Json}
 import play.api.mvc._
@@ -33,7 +34,7 @@ class CarController @Inject()(
         valid =>
           commandHandler.handle(CreateCarCommand(mapperInternal(valid))).map {
             case CarResult(Some(car)) => Created.withHeaders(HeaderNames.LOCATION -> s"/public/v1/cars/${car.id}")
-            case CarResult(_)         => Conflict
+            case _                    => Conflict
         }
       )
   }
@@ -45,7 +46,7 @@ class CarController @Inject()(
         uuid =>
           commandHandler.handle(ReadCarCommand(uuid)).map {
             case CarResult(Some(car)) => Ok(Json.toJson(mapperExternal(car)))
-            case CarResult(_)         => NotFound
+            case _                    => NotFound
         }
       )
   }
@@ -57,7 +58,7 @@ class CarController @Inject()(
         uuid =>
           commandHandler.handle(DeleteCarCommand(uuid)).map {
             case CarResult(Some(car)) => Ok(Json.toJson(mapperExternal(car)))
-            case CarResult(_)         => NotFound
+            case _                    => NotFound
         }
       )
   }
@@ -70,8 +71,16 @@ class CarController @Inject()(
         valid =>
           commandHandler.handle(UpdateCarCommand(mapperInternal(valid))).map {
             case CarResult(Some(_)) => NoContent
-            case CarResult(_)       => NotFound
+            case _                  => NotFound
         }
       )
   }
+
+  def getAll(sort: Option[String], desc: Option[Boolean]): Action[AnyContent] =
+    Action.async {
+      commandHandler.handle(ReadAllCommand(sort, desc)).map {
+        case AllCarResult(cars) => Ok(Json.toJson(AllCarsResponse(cars.map(mapperExternal))))
+        case _                  => NotFound
+      }
+    }
 }

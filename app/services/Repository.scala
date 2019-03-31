@@ -15,6 +15,6 @@ trait Repository[F[_], T] {
 
   def deleteById(id: UUID): F[Option[T]]
 
-  def getAll(criteria: String, desk: Boolean): F[Seq[T]]
+  def getAll(criteria: String, desc: Boolean): F[Seq[T]]
 
 }
