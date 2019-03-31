@@ -1,6 +1,6 @@
 package models
 
-import java.time.LocalDate
+import java.time.ZonedDateTime
 import java.util.UUID
 
 final case class CarInfo(
@@ -10,5 +10,5 @@ final case class CarInfo(
     price: Int,
     isNew: Boolean,
     mileage: Option[Int],
-    registration: Option[LocalDate]
+    registration: Option[ZonedDateTime]
 )

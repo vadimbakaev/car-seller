@@ -1,6 +1,6 @@
 package models.external.response
 
-import java.time.LocalDate
+import java.time.ZonedDateTime
 import java.util.UUID
 
 import models.external.FuelType
@@ -13,7 +13,7 @@ final case class CarResponse(
     price: Int,
     `new`: Boolean,
     mileage: Option[Int],
-    registration: Option[LocalDate]
+    registration: Option[ZonedDateTime]
 )
 
 object CarResponse {

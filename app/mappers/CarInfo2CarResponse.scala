@@ -1,6 +1,6 @@
 package mappers
 
-import java.time.LocalDate
+import java.time.ZonedDateTime
 import java.util.UUID
 
 import models.CarInfo
@@ -16,8 +16,8 @@ class CarInfo2CarResponse extends (CarInfo => CarResponse) {
         price: Int,
         isNew: Boolean,
         mileage: Option[Int],
-        registration: Option[LocalDate]
+        registration: Option[ZonedDateTime]
         ) =>
-      CarResponse(id, title, FuelType.withName(fuel), price, isNew, mileage, registration)
+      CarResponse(id, title, FuelType.values.find(_.toString == fuel).get, price, isNew, mileage, registration)
   }
 }

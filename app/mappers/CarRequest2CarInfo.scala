@@ -1,6 +1,6 @@
 package mappers
 
-import java.time.LocalDate
+import java.time.ZonedDateTime
 import java.util.UUID
 
 import com.google.inject.Singleton
@@ -18,7 +18,7 @@ class CarRequest2CarInfo extends (CarRequest => CarInfo) {
         price: Int,
         isNew: Boolean,
         mileage: Option[Int],
-        registration: Option[LocalDate]
+        registration: Option[ZonedDateTime]
         ) =>
       CarInfo(
         id,

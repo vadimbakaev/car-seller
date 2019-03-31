@@ -1,6 +1,6 @@
 package models.external.request
 
-import java.time.LocalDate
+import java.time.ZonedDateTime
 import java.util.UUID
 
 import models.external.FuelType
@@ -14,7 +14,7 @@ final case class CarRequest(
     price: Int,
     `new`: Boolean,
     mileage: Option[Int],
-    registration: Option[LocalDate]
+    registration: Option[ZonedDateTime]
 )
 
 object CarRequest {
@@ -36,7 +36,7 @@ object CarRequest {
       (__ \ "price").read[Int] ~
       newRead ~
       readConditionally[Int](__ \ "mileage") ~
-      readConditionally[LocalDate](__ \ "registration")
+      readConditionally[ZonedDateTime](__ \ "registration")
     )(CarRequest.apply _)
   }
 

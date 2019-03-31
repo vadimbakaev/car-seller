@@ -1,6 +1,6 @@
 package controllers
 
-import java.time.LocalDate
+import java.time.ZonedDateTime
 import java.util.UUID
 
 import controllers.CarControllerTest._
@@ -214,21 +214,22 @@ object CarControllerTest {
   val AudiCarInfo: CarInfo = CarInfo(
     UUID.fromString(AudiId),
     "Audi A4 Avant",
-    "D",
+    "Diesel",
     7000,
     isNew = true,
     None,
     None
   )
-  val OpelId: String = "18f126d7-708b-4640-83f2-7916b9ad0531"
+  val OpelId: String                           = "18f126d7-708b-4640-83f2-7916b9ad0531"
+  val RegistrationZonedDateTime: ZonedDateTime = ZonedDateTime.parse("2017-07-10T05:33:44.914Z")
   val OpelCarInfo: CarInfo = CarInfo(
     UUID.fromString(AudiId),
     "Opel Manta",
-    "B",
+    "Gasoline",
     5000,
     isNew = false,
     Some(99000),
-    Some(LocalDate.of(2000, 1, 7))
+    Some(RegistrationZonedDateTime)
   )
   val AudiJsonResponse: JsObject = Json.obj(
     "id"    -> AudiCarInfo.id,
@@ -244,7 +245,7 @@ object CarControllerTest {
     "price"        -> OpelCarInfo.price,
     "new"          -> OpelCarInfo.isNew,
     "mileage"      -> 99000,
-    "registration" -> "2000-01-07",
+    "registration" -> "2017-07-10T05:33:44.914Z"
   )
 
 }
