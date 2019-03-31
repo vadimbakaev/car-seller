@@ -126,7 +126,7 @@ class CarControllerTest
       contentAsJson(getCarResponse) mustBe Json.obj(
         "id"    -> AudiCarInfo.id,
         "title" -> AudiCarInfo.title,
-        "fuel"  -> FuelType.Diesel.toString,
+        "fuel"  -> FuelType.Diesel.entryName,
         "price" -> AudiCarInfo.price,
         "new"   -> AudiCarInfo.isNew
       )
@@ -161,7 +161,7 @@ class CarControllerTest
       contentAsJson(deleteCarResponse) mustBe Json.obj(
         "id"           -> OpelCarInfo.id,
         "title"        -> OpelCarInfo.title,
-        "fuel"         -> FuelType.Gasoline.toString,
+        "fuel"         -> FuelType.Gasoline.entryName,
         "price"        -> OpelCarInfo.price,
         "new"          -> OpelCarInfo.isNew,
         "mileage"      -> 99000,

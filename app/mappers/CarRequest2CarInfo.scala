@@ -5,7 +5,7 @@ import java.util.UUID
 
 import com.google.inject.Singleton
 import models.CarInfo
-import models.external.FuelType.FuelType
+import models.external.FuelType
 import models.external.request.CarRequest
 
 @Singleton
