@@ -24,7 +24,7 @@ class StatusControllerTest extends ControllerBaseSpec {
 
   "StatusController GET" should {
     "return status response with application start instance" in new Fixture {
-      val statusResponse: Future[Result] = controller.status.apply(FakeRequest(GET, "/status"))
+      val statusResponse: Future[Result] = controller.status(FakeRequest(GET, "/status"))
 
       status(statusResponse) mustBe OK
       contentType(statusResponse) mustBe Some(ContentTypes.JSON)
@@ -32,8 +32,8 @@ class StatusControllerTest extends ControllerBaseSpec {
     }
 
     "always return the same status" in new Fixture {
-      val statusResponse1: Future[Result] = controller.status.apply(FakeRequest(GET, "/status"))
-      val statusResponse2: Future[Result] = controller.status.apply(FakeRequest(GET, "/status"))
+      val statusResponse1: Future[Result] = controller.status(FakeRequest(GET, "/status"))
+      val statusResponse2: Future[Result] = controller.status(FakeRequest(GET, "/status"))
 
       status(statusResponse1) mustBe status(statusResponse2)
       contentType(statusResponse1) mustBe contentType(statusResponse2)

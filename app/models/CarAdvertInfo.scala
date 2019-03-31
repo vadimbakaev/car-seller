@@ -3,7 +3,7 @@ package models
 import java.time.ZonedDateTime
 import java.util.UUID
 
-final case class CarInfo(
+final case class CarAdvertInfo(
     id: UUID,
     title: String,
     fuel: String,

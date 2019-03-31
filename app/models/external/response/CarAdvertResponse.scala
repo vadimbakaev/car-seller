@@ -6,7 +6,7 @@ import java.util.UUID
 import models.external.FuelType
 import play.api.libs.json.{Format, Json}
 
-final case class CarResponse(
+final case class CarAdvertResponse(
     id: UUID,
     title: String,
     fuel: FuelType,
@@ -16,6 +16,6 @@ final case class CarResponse(
     registration: Option[ZonedDateTime]
 )
 
-object CarResponse {
-  implicit val format: Format[CarResponse] = Json.format
+object CarAdvertResponse {
+  implicit val format: Format[CarAdvertResponse] = Json.format
 }

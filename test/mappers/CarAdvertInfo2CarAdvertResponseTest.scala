@@ -3,18 +3,18 @@ package mappers
 import java.time.ZonedDateTime
 import java.util.UUID
 
-import models.CarInfo
+import models.CarAdvertInfo
 import models.external.FuelType
-import models.external.response.CarResponse
+import models.external.response.CarAdvertResponse
 import org.scalatestplus.play.PlaySpec
 
-class CarInfo2CarResponseTest extends PlaySpec {
+class CarAdvertInfo2CarAdvertResponseTest extends PlaySpec {
 
-  "CarInfo2CarResponse" should {
+  "CarAdvertInfo2CarAdvertResponse" should {
     "correctly map carInfo to response" in {
       val id            = UUID.randomUUID()
       val zonedDateTime = ZonedDateTime.now()
-      val carInfo: CarInfo = CarInfo(
+      val carInfo: CarAdvertInfo = CarAdvertInfo(
         id,
         "title",
         "Diesel",
@@ -23,7 +23,7 @@ class CarInfo2CarResponseTest extends PlaySpec {
         Some(9),
         Some(zonedDateTime)
       )
-      val expectedResponse: CarResponse = CarResponse(
+      val expectedResponse: CarAdvertResponse = CarAdvertResponse(
         id,
         "title",
         FuelType.Diesel,
@@ -33,7 +33,7 @@ class CarInfo2CarResponseTest extends PlaySpec {
         Some(zonedDateTime)
       )
 
-      new CarInfo2CarResponse()(carInfo) mustBe expectedResponse
+      new CarAdvertInfo2CarAdvertResponse()(carInfo) mustBe expectedResponse
     }
   }
 }

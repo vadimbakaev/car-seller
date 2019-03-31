@@ -3,11 +3,11 @@ package controllers
 import java.time.ZonedDateTime
 import java.util.UUID
 
-import controllers.CarControllerTest._
-import mappers.{CarInfo2CarResponse, CarRequest2CarInfo}
-import models.CarInfo
+import controllers.CarAdvertsControllerTest._
+import mappers.{CarAdvertInfo2CarAdvertResponse, CarAdvertRequest2CarAdvertInfo}
+import models.CarAdvertInfo
 import models.external.FuelType
-import models.external.request.CarRequest
+import models.external.request.CarAdvertRequest
 import org.mockito.{ArgumentMatchersSugar, MockitoSugar}
 import org.scalatest.ParallelTestExecution
 import org.scalatest.concurrent.ScalaFutures
@@ -17,11 +17,11 @@ import play.api.mvc.{AnyContent, Result}
 import play.api.test.FakeRequest
 import play.api.test.Helpers.{status, stubControllerComponents, _}
 import play.mvc.Http.HeaderNames
-import services.{CarService, SortKey}
+import services.{CarAdvertsService, SortKey}
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class CarControllerTest
+class CarAdvertsControllerTest
     extends ControllerBaseSpec
     with ScalaFutures
     with MockitoSugar
@@ -30,19 +30,19 @@ class CarControllerTest
 
   trait Fixture {
     implicit val ec: ExecutionContext = inject[ExecutionContext]
-    val carService: CarService        = mock[CarService]
+    val carService: CarAdvertsService = mock[CarAdvertsService]
 
-    val internal   = new CarRequest2CarInfo()
-    val external   = new CarInfo2CarResponse()
-    val controller = new CarController(stubControllerComponents(), internal, external, carService)
+    val internal   = new CarAdvertRequest2CarAdvertInfo()
+    val external   = new CarAdvertInfo2CarAdvertResponse()
+    val controller = new CarAdvertsController(stubControllerComponents(), internal, external, carService)
 
     def createJsValueRequest(method: String, body: JsValue): FakeRequest[JsValue] =
-      FakeRequest(method, "/public/v1/cars")
+      FakeRequest(method, "/public/v1/adverts")
         .withBody(body)
         .withHeaders(HeaderNames.CONTENT_TYPE -> ContentTypes.JSON)
 
     def createAnyContentRequest(method: String, id: String): FakeRequest[AnyContent] =
-      FakeRequest(method, s"/public/v1/cars/$id")
+      FakeRequest(method, s"/public/v1/adverts/$id")
 
     def executePostRequest(body: JsValue): Future[Result] =
       controller.add(createJsValueRequest(POST, body))
@@ -57,7 +57,7 @@ class CarControllerTest
       controller.update(createJsValueRequest(PUT, body))
   }
 
-  "CarController" should {
+  "CarAdvertsController" should {
     "on add return Bad Request when request is invalid, empty json" in new Fixture {
       val body: JsValue                  = Json.obj()
       val addCarResponse: Future[Result] = executePostRequest(body)
@@ -94,7 +94,7 @@ class CarControllerTest
       val addCarResponse: Future[Result] = executePostRequest(body)
 
       status(addCarResponse) mustBe CREATED
-      header(HeaderNames.LOCATION, addCarResponse) mustBe Some(s"/public/v1/cars/$AudiId")
+      header(HeaderNames.LOCATION, addCarResponse) mustBe Some(s"/public/v1/adverts/$AudiId")
 
       verify(carService, times(1)).create(*)
     }
@@ -182,7 +182,7 @@ class CarControllerTest
     "on getAll return Bad Request when sortKy is invalid" in new Fixture {
       val key = "wrongKey"
       val getAllResponse: Future[Result] =
-        controller.getAll(key, desc = false)(FakeRequest(GET, s"/public/v1/cars?sort=$key"))
+        controller.getAll(key, desc = false)(FakeRequest(GET, s"/public/v1/adverts?sort=$key"))
 
       status(getAllResponse) mustBe BAD_REQUEST
 
@@ -194,11 +194,11 @@ class CarControllerTest
 
       val key = "title"
       val getAllResponse: Future[Result] =
-        controller.getAll(key, desc = true)(FakeRequest(GET, s"/public/v1/cars?sort=$key&desc=${true}"))
+        controller.getAll(key, desc = true)(FakeRequest(GET, s"/public/v1/adverts?sort=$key&desc=${true}"))
 
       status(getAllResponse) mustBe OK
 
-      contentAsJson(getAllResponse) mustBe Json.obj("cars" -> Json.arr(AudiJsonResponse))
+      contentAsJson(getAllResponse) mustBe Json.obj("adverts" -> Json.arr(AudiJsonResponse))
 
       verify(carService, times(1)).readAll(*, *)
     }
@@ -206,12 +206,12 @@ class CarControllerTest
   }
 }
 
-object CarControllerTest {
-  val ValidCarRequest: CarRequest =
-    CarRequest(UUID.randomUUID(), "Audi A4 Avant", FuelType.Diesel, 7000, `new` = true, None, None)
-  val InvalidCarRequest: CarRequest = ValidCarRequest.copy(`new` = false)
-  val AudiId: String                = "d5449989-95b1-4b0b-a94f-eb653d1171d2"
-  val AudiCarInfo: CarInfo = CarInfo(
+object CarAdvertsControllerTest {
+  val ValidCarRequest: CarAdvertRequest =
+    CarAdvertRequest(UUID.randomUUID(), "Audi A4 Avant", FuelType.Diesel, 7000, `new` = true, None, None)
+  val InvalidCarRequest: CarAdvertRequest = ValidCarRequest.copy(`new` = false)
+  val AudiId: String                      = "d5449989-95b1-4b0b-a94f-eb653d1171d2"
+  val AudiCarInfo: CarAdvertInfo = CarAdvertInfo(
     UUID.fromString(AudiId),
     "Audi A4 Avant",
     "Diesel",
@@ -222,7 +222,7 @@ object CarControllerTest {
   )
   val OpelId: String                           = "18f126d7-708b-4640-83f2-7916b9ad0531"
   val RegistrationZonedDateTime: ZonedDateTime = ZonedDateTime.parse("2017-07-10T05:33:44.914Z")
-  val OpelCarInfo: CarInfo = CarInfo(
+  val OpelCarInfo: CarAdvertInfo = CarAdvertInfo(
     UUID.fromString(AudiId),
     "Opel Manta",
     "Gasoline",

@@ -4,7 +4,7 @@ import java.util.UUID
 
 import com.google.inject.{Inject, Singleton}
 import com.mongodb.{ConnectionString, DuplicateKeyException, MongoWriteException}
-import models.CarInfo
+import models.CarAdvertInfo
 import org.bson.codecs.configuration.CodecRegistries.{fromProviders, fromRegistries}
 import org.mongodb.scala.bson.codecs.DEFAULT_CODEC_REGISTRY
 import org.mongodb.scala.bson.codecs.Macros._
@@ -12,17 +12,17 @@ import org.mongodb.scala.connection.ClusterSettings
 import org.mongodb.scala.model.{Filters, IndexOptions, Indexes, Sorts}
 import org.mongodb.scala.{MongoClient, MongoClientSettings, MongoCollection, MongoDatabase}
 import play.api.{Configuration, Logging}
-import services.{CarInfoRepository, SortKey}
-import services.mongo.MongoCarInfoRepository._
+import services.{CarAdvertsInfoRepository, SortKey}
+import services.mongo.MongoCarAdvertsInfoRepository._
 
 import scala.collection.immutable
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class MongoCarInfoRepository @Inject()(
+class MongoCarAdvertsInfoRepository @Inject()(
     config: Configuration
 )(implicit ec: ExecutionContext)
-    extends CarInfoRepository
+    extends CarAdvertsInfoRepository
     with Logging {
 
   private lazy val mongodbURI     = config.get[String](Uri)
@@ -43,22 +43,22 @@ class MongoCarInfoRepository @Inject()(
     .getDatabase(databaseName)
     .withCodecRegistry(
       fromRegistries(
-        fromProviders(classOf[CarInfo]),
+        fromProviders(classOf[CarAdvertInfo]),
         DEFAULT_CODEC_REGISTRY
       )
     )
 
-  private lazy val collectionF: Future[MongoCollection[CarInfo]] = initCollection(database)
+  private lazy val collectionF: Future[MongoCollection[CarAdvertInfo]] = initCollection(database)
 
-  private def initCollection(database: MongoDatabase): Future[MongoCollection[CarInfo]] = {
-    val collection = database.getCollection[CarInfo](collectionName)
+  private def initCollection(database: MongoDatabase): Future[MongoCollection[CarAdvertInfo]] = {
+    val collection = database.getCollection[CarAdvertInfo](collectionName)
     collection
       .createIndex(Indexes.ascending("id"), IndexOptions().background(false).unique(true))
       .toFuture()
       .map(_ => collection)
   }
 
-  override def create(model: CarInfo): Future[Option[CarInfo]] = collectionF.flatMap { collection =>
+  override def create(model: CarAdvertInfo): Future[Option[CarAdvertInfo]] = collectionF.flatMap { collection =>
     collection.insertOne(model).toFuture.map(_ => Some(model)).recover {
       case dke: DuplicateKeyException =>
         logger.warn("Duplicated key", dke)
@@ -69,19 +69,19 @@ class MongoCarInfoRepository @Inject()(
     }
   }
 
-  override def getById(id: UUID): Future[Option[CarInfo]] = collectionF.flatMap { collection =>
-    collection.find[CarInfo](Filters.eq("id", id)).toFuture().map(_.headOption)
+  override def getById(id: UUID): Future[Option[CarAdvertInfo]] = collectionF.flatMap { collection =>
+    collection.find[CarAdvertInfo](Filters.eq("id", id)).toFuture().map(_.headOption)
   }
 
-  override def update(model: CarInfo): Future[Option[CarInfo]] = collectionF.flatMap { collection =>
+  override def update(model: CarAdvertInfo): Future[Option[CarAdvertInfo]] = collectionF.flatMap { collection =>
     collection.findOneAndReplace(Filters.eq("id", model.id), model).toFutureOption()
   }
 
-  override def deleteById(id: UUID): Future[Option[CarInfo]] = collectionF.flatMap { collection =>
+  override def deleteById(id: UUID): Future[Option[CarAdvertInfo]] = collectionF.flatMap { collection =>
     collection.findOneAndDelete(Filters.eq("id", id)).toFutureOption()
   }
 
-  override def getAll(sortBy: SortKey, desc: Boolean): Future[immutable.Seq[CarInfo]] = collectionF.flatMap {
+  override def getAll(sortBy: SortKey, desc: Boolean): Future[immutable.Seq[CarAdvertInfo]] = collectionF.flatMap {
     collection =>
       collection
         .find()
@@ -92,7 +92,7 @@ class MongoCarInfoRepository @Inject()(
 
 }
 
-object MongoCarInfoRepository {
+object MongoCarAdvertsInfoRepository {
   val Uri            = "services.mongo.uri"
   val Db             = "services.mongo.database"
   val CollectionName = "services.mongo.collection"

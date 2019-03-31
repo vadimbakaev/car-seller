@@ -3,37 +3,37 @@ package controllers
 import java.util.UUID
 
 import javax.inject._
-import mappers.{CarInfo2CarResponse, CarRequest2CarInfo}
-import models.external.request.CarRequest
-import models.external.response.AllCarsResponse
+import mappers.{CarAdvertInfo2CarAdvertResponse, CarAdvertRequest2CarAdvertInfo}
+import models.external.request.CarAdvertRequest
+import models.external.response.AllCarAdvertsResponse
 import play.api.Logging
 import play.api.libs.json.{JsError, JsValue, Json}
 import play.api.mvc._
 import play.mvc.Http.HeaderNames
-import services.{CarService, SortKey}
+import services.{CarAdvertsService, SortKey}
 
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.Try
 
 @Singleton
-class CarController @Inject()(
+class CarAdvertsController @Inject()(
     cc: ControllerComponents,
-    mapperInternal: CarRequest2CarInfo,
-    mapperExternal: CarInfo2CarResponse,
-    catService: CarService
+    mapperInternal: CarAdvertRequest2CarAdvertInfo,
+    mapperExternal: CarAdvertInfo2CarAdvertResponse,
+    catService: CarAdvertsService
 )(implicit exec: ExecutionContext)
     extends AbstractController(cc)
     with Logging {
 
   def add: Action[JsValue] = Action.async(parse.json) { implicit request =>
     request.body
-      .validate[CarRequest]
+      .validate[CarAdvertRequest]
       .fold(
         invalid => Future.successful(BadRequest(JsError.toJson(invalid))),
         valid =>
           catService.create(mapperInternal(valid)).map {
-            case Some(car) => Created.withHeaders(HeaderNames.LOCATION -> s"/public/v1/cars/${car.id}")
-            case _         => Conflict
+            case Some(advert) => Created.withHeaders(HeaderNames.LOCATION -> s"/public/v1/adverts/${advert.id}")
+            case _            => Conflict
         }
       )
   }
@@ -44,8 +44,8 @@ class CarController @Inject()(
         _ => Future.successful(NotFound),
         uuid =>
           catService.read(uuid).map {
-            case Some(car) => Ok(Json.toJson(mapperExternal(car)))
-            case _         => NotFound
+            case Some(advert) => Ok(Json.toJson(mapperExternal(advert)))
+            case _            => NotFound
         }
       )
   }
@@ -56,15 +56,15 @@ class CarController @Inject()(
         _ => Future.successful(NotFound),
         uuid =>
           catService.delete(uuid).map {
-            case Some(car) => Ok(Json.toJson(mapperExternal(car)))
-            case _         => NotFound
+            case Some(advert) => Ok(Json.toJson(mapperExternal(advert)))
+            case _            => NotFound
         }
       )
   }
 
   def update: Action[JsValue] = Action.async(parse.json) { implicit request =>
     request.body
-      .validate[CarRequest]
+      .validate[CarAdvertRequest]
       .fold(
         invalid => Future.successful(BadRequest(JsError.toJson(invalid))),
         valid =>
@@ -79,8 +79,8 @@ class CarController @Inject()(
     Action.async {
       SortKey.withNameInsensitiveOption(sort) match {
         case Some(sortKey) =>
-          catService.readAll(sortKey, desc).map { cars =>
-            Ok(Json.toJson(AllCarsResponse(cars.map(mapperExternal))))
+          catService.readAll(sortKey, desc).map { adverts =>
+            Ok(Json.toJson(AllCarAdvertsResponse(adverts.map(mapperExternal))))
           }
         case None => Future.successful(BadRequest)
       }

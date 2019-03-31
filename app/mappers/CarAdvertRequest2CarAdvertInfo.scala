@@ -4,14 +4,14 @@ import java.time.ZonedDateTime
 import java.util.UUID
 
 import com.google.inject.Singleton
-import models.CarInfo
+import models.CarAdvertInfo
 import models.external.FuelType
-import models.external.request.CarRequest
+import models.external.request.CarAdvertRequest
 
 @Singleton
-class CarRequest2CarInfo extends (CarRequest => CarInfo) {
-  override def apply(v1: CarRequest): CarInfo = v1 match {
-    case CarRequest(
+class CarAdvertRequest2CarAdvertInfo extends (CarAdvertRequest => CarAdvertInfo) {
+  override def apply(v1: CarAdvertRequest): CarAdvertInfo = v1 match {
+    case CarAdvertRequest(
         id: UUID,
         title: String,
         fuel: FuelType,
@@ -20,7 +20,7 @@ class CarRequest2CarInfo extends (CarRequest => CarInfo) {
         mileage: Option[Int],
         registration: Option[ZonedDateTime]
         ) =>
-      CarInfo(
+      CarAdvertInfo(
         id,
         title,
         fuel.toString,
