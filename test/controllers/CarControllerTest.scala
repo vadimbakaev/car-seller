@@ -73,7 +73,7 @@ class CarControllerTest
     }
 
     "on add return Conflict when car already created" in new Fixture {
-      when(commandHandler.handle(*[AddCarCommand])).thenReturn(Future.successful(AddCarResult(None)))
+      when(commandHandler.handle(*[CreateCarCommand])).thenReturn(Future.successful(CarResult(None)))
 
       val body: JsValue                  = Json.toJson(ValidCarRequest)
       val addCarResponse: Future[Result] = executeCreateRequest(body)
@@ -84,7 +84,7 @@ class CarControllerTest
     }
 
     "on add return Created" in new Fixture {
-      when(commandHandler.handle(*[AddCarCommand])).thenReturn(Future.successful(AddCarResult(Some(AudiId))))
+      when(commandHandler.handle(*[CreateCarCommand])).thenReturn(Future.successful(CarResult(Some(AudiCarInfo))))
 
       val body: JsValue                  = Json.toJson(ValidCarRequest)
       val addCarResponse: Future[Result] = executeCreateRequest(body)
@@ -105,7 +105,7 @@ class CarControllerTest
     }
 
     "on get return Not Found when commandHandler doesn't return car" in new Fixture {
-      when(commandHandler.handle(*[GetCarCommand])).thenReturn(Future.successful(CarResult(None)))
+      when(commandHandler.handle(*[ReadCarCommand])).thenReturn(Future.successful(CarResult(None)))
 
       val getCarResponse: Future[Result] = executeGetRequest(AudiId)
 
@@ -115,7 +115,7 @@ class CarControllerTest
     }
 
     "on get return Ok with json body" in new Fixture {
-      when(commandHandler.handle(*[GetCarCommand])).thenReturn(Future.successful(CarResult(Some(AudiCarInfo))))
+      when(commandHandler.handle(*[ReadCarCommand])).thenReturn(Future.successful(CarResult(Some(AudiCarInfo))))
 
       val getCarResponse: Future[Result] = executeGetRequest(AudiId)
 

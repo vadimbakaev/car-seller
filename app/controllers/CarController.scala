@@ -31,28 +31,26 @@ class CarController @Inject()(
       .fold(
         invalid => Future(BadRequest(JsError.toJson(invalid))),
         valid =>
-          commandHandler.handle(AddCarCommand(mapperInternal(valid))).map {
-            case AddCarResult(Some(id)) => Created.withHeaders(HeaderNames.LOCATION -> s"/public/v1/cars/$id")
-            case AddCarResult(_)        => Conflict
-            case _                      => InternalServerError
+          commandHandler.handle(CreateCarCommand(mapperInternal(valid))).map {
+            case CarResult(Some(car)) => Created.withHeaders(HeaderNames.LOCATION -> s"/public/v1/cars/${car.id}")
+            case CarResult(_)         => Conflict
         }
       )
   }
 
-  def get(id: String): Action[AnyContent] = Action.async { implicit request =>
+  def get(id: String): Action[AnyContent] = Action.async {
     Try(UUID.fromString(id))
       .fold(
         _ => Future.successful(NotFound),
         uuid =>
-          commandHandler.handle(GetCarCommand(uuid)).map {
+          commandHandler.handle(ReadCarCommand(uuid)).map {
             case CarResult(Some(car)) => Ok(Json.toJson(mapperExternal(car)))
             case CarResult(_)         => NotFound
-            case _                    => InternalServerError
         }
       )
   }
 
-  def delete(id: String): Action[AnyContent] = Action.async { implicit request =>
+  def delete(id: String): Action[AnyContent] = Action.async {
     Try(UUID.fromString(id))
       .fold(
         _ => Future.successful(NotFound),
@@ -60,7 +58,19 @@ class CarController @Inject()(
           commandHandler.handle(DeleteCarCommand(uuid)).map {
             case CarResult(Some(car)) => Ok(Json.toJson(mapperExternal(car)))
             case CarResult(_)         => NotFound
-            case _                    => InternalServerError
+        }
+      )
+  }
+
+  def update: Action[JsValue] = Action.async(parse.json) { implicit request =>
+    request.body
+      .validate[CarRequest]
+      .fold(
+        invalid => Future(BadRequest(JsError.toJson(invalid))),
+        valid =>
+          commandHandler.handle(UpdateCarCommand(mapperInternal(valid))).map {
+            case CarResult(Some(_)) => NoContent
+            case CarResult(_)       => NotFound
         }
       )
   }

@@ -73,7 +73,9 @@ class MongoCarInfoRepository @Inject()(
     collection.find[CarInfo](Filters.eq("id", id)).toFuture().map(_.headOption)
   }
 
-  override def update(model: CarInfo): Future[Option[CarInfo]] = ???
+  override def update(model: CarInfo): Future[Option[CarInfo]] = collectionF.flatMap { collection =>
+    collection.findOneAndReplace(Filters.eq("id", model.id), model).toFutureOption()
+  }
 
   override def deleteById(id: UUID): Future[Option[CarInfo]] = collectionF.flatMap { collection =>
     collection.findOneAndDelete(Filters.eq("id", id)).toFutureOption()
