@@ -20,13 +20,9 @@ class CommandHandlerImpl @Inject()(
     extends CommandHandler
     with Logging {
   override def handle(command: Command): Future[CommandResult] = command match {
-    case CreateCarCommand(car) =>
-      repository.create(car).map(CarResult)
-    case UpdateCarCommand(car) =>
-      repository.update(car).map(CarResult)
-    case ReadCarCommand(id) =>
-      repository.getById(id).map(CarResult)
-    case DeleteCarCommand(id) =>
-      repository.deleteById(id).map(CarResult)
+    case CreateCarCommand(car) => repository.create(car).map(CarResult)
+    case UpdateCarCommand(car) => repository.update(car).map(CarResult)
+    case ReadCarCommand(id)    => repository.getById(id).map(CarResult)
+    case DeleteCarCommand(id)  => repository.deleteById(id).map(CarResult)
   }
 }
