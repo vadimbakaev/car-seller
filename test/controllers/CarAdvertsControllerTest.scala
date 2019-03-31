@@ -239,13 +239,13 @@ object CarAdvertsControllerTest {
     "new"   -> AudiCarInfo.isNew
   )
   val OpelJsonResponse: JsObject = Json.obj(
-    "id"           -> OpelCarInfo.id,
-    "title"        -> OpelCarInfo.title,
-    "fuel"         -> FuelType.Gasoline.entryName,
-    "price"        -> OpelCarInfo.price,
-    "new"          -> OpelCarInfo.isNew,
-    "mileage"      -> 99000,
-    "registration" -> "2017-07-10T05:33:44.914Z"
+    "id"                 -> OpelCarInfo.id,
+    "title"              -> OpelCarInfo.title,
+    "fuel"               -> FuelType.Gasoline.entryName,
+    "price"              -> OpelCarInfo.price,
+    "new"                -> OpelCarInfo.isNew,
+    "mileage"            -> 99000,
+    "first registration" -> "2017-07-10T05:33:44.914Z"
   )
 
 }

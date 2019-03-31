@@ -14,7 +14,7 @@ final case class CarAdvertRequest(
     price: Int,
     `new`: Boolean,
     mileage: Option[Int],
-    registration: Option[ZonedDateTime]
+    `first registration`: Option[ZonedDateTime]
 )
 
 object CarAdvertRequest {
