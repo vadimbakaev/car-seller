@@ -1,5 +1,6 @@
 package controllers
 
+import java.time.LocalDate
 import java.util.UUID
 
 import controllers.CarControllerTest._
@@ -46,6 +47,10 @@ class CarControllerTest
       val request: FakeRequest[AnyContent] = FakeRequest(GET, s"/public/v1/cars/$id")
       controller.get(id).apply(request)
     }
+    def executeDeleteRequest(id: String): Future[Result] = {
+      val request: FakeRequest[AnyContent] = FakeRequest(DELETE, s"/public/v1/cars/$id")
+      controller.get(id).apply(request)
+    }
   }
 
   "CarController POST" should {
@@ -68,7 +73,7 @@ class CarControllerTest
     }
 
     "on add return Conflict when car already created" in new Fixture {
-      when(commandHandler.handle(*[AddCarCommand])).thenReturn(Future.successful(FailedResult))
+      when(commandHandler.handle(*[AddCarCommand])).thenReturn(Future.successful(AddCarResult(None)))
 
       val body: JsValue                  = Json.toJson(ValidCarRequest)
       val addCarResponse: Future[Result] = executeCreateRequest(body)
@@ -79,7 +84,7 @@ class CarControllerTest
     }
 
     "on add return Created" in new Fixture {
-      when(commandHandler.handle(*[AddCarCommand])).thenReturn(Future.successful(AddCarResult(AudiId)))
+      when(commandHandler.handle(*[AddCarCommand])).thenReturn(Future.successful(AddCarResult(Some(AudiId))))
 
       val body: JsValue                  = Json.toJson(ValidCarRequest)
       val addCarResponse: Future[Result] = executeCreateRequest(body)
@@ -96,10 +101,11 @@ class CarControllerTest
       val getCarResponse: Future[Result] = executeGetRequest(id)
 
       status(getCarResponse) mustBe NOT_FOUND
+      verify(commandHandler, times(0)).handle(*)
     }
 
-    "on get return Not Found when commandHandler don't return car" in new Fixture {
-      when(commandHandler.handle(*[GetCarCommand])).thenReturn(Future.successful(FailedResult))
+    "on get return Not Found when commandHandler doesn't return car" in new Fixture {
+      when(commandHandler.handle(*[GetCarCommand])).thenReturn(Future.successful(CarResult(None)))
 
       val getCarResponse: Future[Result] = executeGetRequest(AudiId)
 
@@ -109,7 +115,7 @@ class CarControllerTest
     }
 
     "on get return Ok with json body" in new Fixture {
-      when(commandHandler.handle(*[GetCarCommand])).thenReturn(Future.successful(CarResult(AudiCarInfo)))
+      when(commandHandler.handle(*[GetCarCommand])).thenReturn(Future.successful(CarResult(Some(AudiCarInfo))))
 
       val getCarResponse: Future[Result] = executeGetRequest(AudiId)
 
@@ -120,6 +126,45 @@ class CarControllerTest
         "fuel"  -> FuelType.Diesel.toString,
         "price" -> AudiCarInfo.price,
         "new"   -> AudiCarInfo.isNew
+      )
+
+      verify(commandHandler, times(1)).handle(*)
+    }
+
+    "on delete return Not Found when id is invalid" in new Fixture {
+      val id = "777"
+
+      val deleteCarResponse: Future[Result] = executeDeleteRequest(id)
+
+      status(deleteCarResponse) mustBe NOT_FOUND
+
+      verify(commandHandler, times(0)).handle(*)
+    }
+
+    "on delete return Not Found when commandHandler doesn't return car" in new Fixture {
+      when(commandHandler.handle(*[DeleteCarCommand])).thenReturn(Future.successful(CarResult(None)))
+
+      val deleteCarResponse: Future[Result] = executeDeleteRequest(AudiId)
+
+      status(deleteCarResponse) mustBe NOT_FOUND
+
+      verify(commandHandler, times(1)).handle(*)
+    }
+
+    "on delete return return Ok with json body" in new Fixture {
+      when(commandHandler.handle(*[DeleteCarCommand])).thenReturn(Future.successful(CarResult(Some(OpelCarInfo))))
+
+      val deleteCarResponse: Future[Result] = executeDeleteRequest(OpelId)
+
+      status(deleteCarResponse) mustBe OK
+      contentAsJson(deleteCarResponse) mustBe Json.obj(
+        "id"           -> OpelCarInfo.id,
+        "title"        -> OpelCarInfo.title,
+        "fuel"         -> FuelType.Gasoline.toString,
+        "price"        -> OpelCarInfo.price,
+        "new"          -> OpelCarInfo.isNew,
+        "mileage"      -> 99000,
+        "registration" -> "2000-01-07",
       )
 
       verify(commandHandler, times(1)).handle(*)
@@ -140,5 +185,15 @@ object CarControllerTest {
     isNew = true,
     None,
     None
+  )
+  val OpelId: String = "18f126d7-708b-4640-83f2-7916b9ad0531"
+  val OpelCarInfo: CarInfo = CarInfo(
+    UUID.fromString(AudiId),
+    "Opel Manta",
+    "B",
+    5000,
+    isNew = false,
+    Some(99000),
+    Some(LocalDate.of(2000, 1, 7))
   )
 }
