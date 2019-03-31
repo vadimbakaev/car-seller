@@ -42,10 +42,7 @@ class CarController @Inject()(
   def get(id: String): Action[AnyContent] = Action.async { implicit request =>
     Try(UUID.fromString(id))
       .fold(
-        throwable => {
-          logger.warn(s"Invalid id [$id]", throwable)
-          Future.successful(BadRequest)
-        },
+        _ => Future.successful(NotFound),
         uuid =>
           commandHandler.handle(GetCarCommand(uuid)).map {
             case CarResult(car) => Ok(Json.toJson(mapperExternal(car)))
