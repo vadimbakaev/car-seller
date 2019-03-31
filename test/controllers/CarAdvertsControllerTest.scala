@@ -71,8 +71,8 @@ class CarAdvertsControllerTest
 
       status(addCarResponse) mustBe BAD_REQUEST
       contentAsJson(addCarResponse) mustBe Json.obj(
-        "obj.registration" -> Json.arr(Json.obj("msg" -> Json.arr("error.path.missing"), "args" -> Json.arr())),
-        "obj.mileage"      -> Json.arr(Json.obj("msg" -> Json.arr("error.path.missing"), "args" -> Json.arr()))
+        "obj.first registration" -> Json.arr(Json.obj("msg" -> Json.arr("error.path.missing"), "args" -> Json.arr())),
+        "obj.mileage"            -> Json.arr(Json.obj("msg" -> Json.arr("error.path.missing"), "args" -> Json.arr()))
       )
     }
 

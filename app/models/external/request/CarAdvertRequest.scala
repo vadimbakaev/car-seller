@@ -25,7 +25,7 @@ object CarAdvertRequest {
 
     def readConditionally[T](path: JsPath)(implicit r: Reads[T]): Reads[Option[T]] =
       newRead.flatMap { isNew =>
-        if (isNew) path.readNullable[T]
+        if (isNew) Reads.constraints.pure(None)
         else path.read[T].map(Some(_))
       }
 
@@ -36,7 +36,7 @@ object CarAdvertRequest {
       (__ \ "price").read[Int] ~
       newRead ~
       readConditionally[Int](__ \ "mileage") ~
-      readConditionally[ZonedDateTime](__ \ "registration")
+      readConditionally[ZonedDateTime](__ \ "first registration")
     )(CarAdvertRequest.apply _)
   }
 
