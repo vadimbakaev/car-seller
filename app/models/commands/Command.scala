@@ -10,6 +10,8 @@ final case class AddCarCommand(car: CarInfo) extends Command
 
 final case class GetCarCommand(id: UUID) extends Command
 
+final case class DeleteCarCommand(id: UUID) extends Command
+
 sealed trait CommandResult
 
 final case class AddCarResult(carId: String) extends CommandResult

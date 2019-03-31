@@ -34,5 +34,12 @@ class CommandHandlerImpl @Inject()(
           case Some(carInfo) => CarResult(carInfo)
           case _             => FailedResult
         }
+    case DeleteCarCommand(id) =>
+      repository
+        .deleteById(id)
+        .map {
+          case Some(carInfo) => CarResult(carInfo)
+          case _             => FailedResult
+        }
   }
 }

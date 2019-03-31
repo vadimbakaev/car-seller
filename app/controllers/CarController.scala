@@ -52,4 +52,16 @@ class CarController @Inject()(
       )
   }
 
+  def delete(id: String): Action[AnyContent] = Action.async { implicit request =>
+    Try(UUID.fromString(id))
+      .fold(
+        _ => Future.successful(NotFound),
+        uuid =>
+          commandHandler.handle(DeleteCarCommand(uuid)).map {
+            case CarResult(car) => Ok(Json.toJson(mapperExternal(car)))
+            case FailedResult   => NotFound
+            case _              => InternalServerError
+        }
+      )
+  }
 }
