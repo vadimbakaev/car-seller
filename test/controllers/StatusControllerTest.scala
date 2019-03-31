@@ -2,7 +2,7 @@ package controllers
 
 import java.time.{Clock, Instant, ZoneId}
 
-import models.response.StatusResponse
+import models.external.response.StatusResponse
 import play.api.http.ContentTypes
 import play.api.libs.json.JsSuccess
 import play.api.mvc.Result

@@ -1,7 +1,7 @@
 package services
 
 import com.google.inject.{ImplementedBy, Inject, Singleton}
-import models.commands.{AddCarCommand, AddCarResult, CarResult, Command, CommandResult, FailedResult, GetCarCommand}
+import models.commands._
 import play.api.Logging
 
 import scala.concurrent.{ExecutionContext, Future}

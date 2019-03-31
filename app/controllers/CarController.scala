@@ -5,7 +5,7 @@ import java.util.UUID
 import javax.inject._
 import mappers.{CarInfo2CarResponse, CarRequest2CarInfo}
 import models.commands._
-import models.request.CarRequest
+import models.external.request.CarRequest
 import play.api.Logging
 import play.api.libs.json.{JsError, JsValue, Json}
 import play.api.mvc._

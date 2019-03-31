@@ -1,4 +1,4 @@
-package models.response
+package models.external.response
 
 import java.time.Instant
 

@@ -3,7 +3,7 @@ package controllers
 import java.time.{Clock, Instant}
 
 import javax.inject._
-import models.response.StatusResponse
+import models.external.response.StatusResponse
 import play.api.Logging
 import play.api.libs.json.Json
 import play.api.mvc._

@@ -3,8 +3,9 @@ package mappers
 import java.time.LocalDate
 import java.util.UUID
 
-import models.{CarInfo, FuelType}
-import models.response.CarResponse
+import models.CarInfo
+import models.external.FuelType
+import models.external.response.CarResponse
 
 class CarInfo2CarResponse extends (CarInfo => CarResponse) {
   override def apply(v1: CarInfo): CarResponse = v1 match {

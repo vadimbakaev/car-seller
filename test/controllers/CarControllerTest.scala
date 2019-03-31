@@ -2,10 +2,12 @@ package controllers
 
 import java.util.UUID
 
+import controllers.CarControllerTest._
 import mappers.{CarInfo2CarResponse, CarRequest2CarInfo}
-import models.{CarInfo, FuelType}
-import models.commands.{AddCarCommand, AddCarResult, CarResult, FailedResult, GetCarCommand}
-import models.request.CarRequest
+import models.CarInfo
+import models.commands._
+import models.external.FuelType
+import models.external.request.CarRequest
 import org.mockito.{ArgumentMatchersSugar, MockitoSugar}
 import org.scalatest.ParallelTestExecution
 import org.scalatest.concurrent.ScalaFutures
@@ -16,7 +18,6 @@ import play.api.test.FakeRequest
 import play.api.test.Helpers.{status, stubControllerComponents, _}
 import play.mvc.Http.HeaderNames
 import services.CommandHandler
-import CarControllerTest._
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -116,7 +117,7 @@ class CarControllerTest
       contentAsJson(getCarResponse) mustBe Json.obj(
         "id"    -> AudiCarInfo.id,
         "title" -> AudiCarInfo.title,
-        "fuel"  -> AudiCarInfo.fuel.toString,
+        "fuel"  -> FuelType.Diesel.toString,
         "price" -> AudiCarInfo.price,
         "new"   -> AudiCarInfo.isNew
       )
