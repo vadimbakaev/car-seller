@@ -2,7 +2,7 @@ package controllers
 
 import java.util.UUID
 
-import mappers.CarRequest2CarInfo
+import mappers.{CarInfo2CarResponse, CarRequest2CarInfo}
 import models.FuelType
 import models.commands.{AddCarResult, FailedResult}
 import models.request.CarRequest
@@ -17,6 +17,7 @@ import play.api.test.Helpers.{status, stubControllerComponents, _}
 import play.mvc.Http.HeaderNames
 import services.CommandHandler
 import CarControllerTest._
+
 import scala.concurrent.{ExecutionContext, Future}
 
 class CarControllerTest
@@ -30,7 +31,9 @@ class CarControllerTest
     implicit val ec: ExecutionContext  = inject[ExecutionContext]
     val commandHandler: CommandHandler = mock[CommandHandler]
 
-    val controller = new CarController(stubControllerComponents(), new CarRequest2CarInfo(), commandHandler)
+    val internal   = new CarRequest2CarInfo()
+    val external   = new CarInfo2CarResponse()
+    val controller = new CarController(stubControllerComponents(), internal, external, commandHandler)
 
     def executeGETRequest(body: JsValue): Future[Result] = {
       val request: FakeRequest[JsValue] = FakeRequest(POST, "/public/v1/cars")

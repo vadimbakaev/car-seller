@@ -6,4 +6,5 @@
 # An example controller showing a sample home page
 GET     /status                           controllers.StatusController.status
 
-POST    /public/v1/cars                    controllers.CarController.add
+POST    /public/v1/cars                   controllers.CarController.add
+GET     /public/v1/cars/:id               controllers.CarController.get(id: String)
