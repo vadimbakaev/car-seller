@@ -1,6 +1,6 @@
 package mappers
 
-import java.time.ZonedDateTime
+import java.time.{Instant, ZonedDateTime}
 import java.util.UUID
 
 import com.google.inject.Singleton
@@ -18,7 +18,7 @@ class CarAdvertRequest2CarAdvertInfo extends (CarAdvertRequest => CarAdvertInfo)
         price: Int,
         isNew: Boolean,
         mileage: Option[Int],
-        registration: Option[ZonedDateTime]
+        registration: Option[Instant]
         ) =>
       CarAdvertInfo(
         id,

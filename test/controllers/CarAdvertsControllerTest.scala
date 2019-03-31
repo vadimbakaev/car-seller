@@ -229,7 +229,7 @@ object CarAdvertsControllerTest {
     5000,
     isNew = false,
     Some(99000),
-    Some(RegistrationZonedDateTime)
+    Some(RegistrationZonedDateTime.toInstant)
   )
   val AudiJsonResponse: JsObject = Json.obj(
     "id"    -> AudiCarInfo.id,

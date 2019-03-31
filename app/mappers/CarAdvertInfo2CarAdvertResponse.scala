@@ -1,6 +1,6 @@
 package mappers
 
-import java.time.ZonedDateTime
+import java.time.Instant
 import java.util.UUID
 
 import models.CarAdvertInfo
@@ -16,7 +16,7 @@ class CarAdvertInfo2CarAdvertResponse extends (CarAdvertInfo => CarAdvertRespons
         price: Int,
         isNew: Boolean,
         mileage: Option[Int],
-        registration: Option[ZonedDateTime]
+        registration: Option[Instant]
         ) =>
       CarAdvertResponse(id, title, FuelType.values.find(_.toString == fuel).get, price, isNew, mileage, registration)
   }

@@ -12,8 +12,8 @@ class CarAdvertInfo2CarAdvertResponseTest extends PlaySpec {
 
   "CarAdvertInfo2CarAdvertResponse" should {
     "correctly map carInfo to response" in {
-      val id            = UUID.randomUUID()
-      val zonedDateTime = ZonedDateTime.now()
+      val id      = UUID.randomUUID()
+      val instant = ZonedDateTime.now().toInstant
       val carInfo: CarAdvertInfo = CarAdvertInfo(
         id,
         "title",
@@ -21,7 +21,7 @@ class CarAdvertInfo2CarAdvertResponseTest extends PlaySpec {
         9000,
         isNew = false,
         Some(9),
-        Some(zonedDateTime)
+        Some(instant)
       )
       val expectedResponse: CarAdvertResponse = CarAdvertResponse(
         id,
@@ -30,7 +30,7 @@ class CarAdvertInfo2CarAdvertResponseTest extends PlaySpec {
         9000,
         `new` = false,
         Some(9),
-        Some(zonedDateTime)
+        Some(instant)
       )
 
       new CarAdvertInfo2CarAdvertResponse()(carInfo) mustBe expectedResponse
