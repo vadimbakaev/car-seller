@@ -14,8 +14,6 @@ final case class DeleteCarCommand(id: UUID) extends Command
 
 sealed trait CommandResult
 
-final case class AddCarResult(carId: String) extends CommandResult
+final case class AddCarResult(carId: Option[String]) extends CommandResult
 
-final case class CarResult(carInfo: CarInfo) extends CommandResult
-
-case object FailedResult extends CommandResult
+final case class CarResult(carInfo: Option[CarInfo]) extends CommandResult

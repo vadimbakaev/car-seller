@@ -23,23 +23,14 @@ class CommandHandlerImpl @Inject()(
     case AddCarCommand(car) =>
       repository
         .create(car)
-        .map {
-          case Some(carInfo) => AddCarResult(carInfo.id.toString)
-          case _             => FailedResult
-        }
+        .map(maybeCartInfo => AddCarResult(maybeCartInfo.map(_.id.toString)))
     case GetCarCommand(id) =>
       repository
         .getById(id)
-        .map {
-          case Some(carInfo) => CarResult(carInfo)
-          case _             => FailedResult
-        }
+        .map(CarResult)
     case DeleteCarCommand(id) =>
       repository
         .deleteById(id)
-        .map {
-          case Some(carInfo) => CarResult(carInfo)
-          case _             => FailedResult
-        }
+        .map(CarResult)
   }
 }
