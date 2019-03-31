@@ -5,7 +5,7 @@ import java.util.UUID
 import scala.collection.immutable.Seq
 import scala.language.higherKinds
 
-trait Repository[F[_], T] {
+trait Repository[F[_], T, C] {
 
   def create(model: T): F[Option[T]]
 
@@ -15,6 +15,6 @@ trait Repository[F[_], T] {
 
   def deleteById(id: UUID): F[Option[T]]
 
-  def getAll(criteria: String, desc: Boolean): F[Seq[T]]
+  def getAll(criteria: C, desc: Boolean): F[Seq[T]]
 
 }

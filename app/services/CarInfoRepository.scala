@@ -7,4 +7,4 @@ import services.mongo.MongoCarInfoRepository
 import scala.concurrent.Future
 
 @ImplementedBy(classOf[MongoCarInfoRepository])
-trait CarInfoRepository extends Repository[Future, CarInfo]
+trait CarInfoRepository extends Repository[Future, CarInfo, SortKey]

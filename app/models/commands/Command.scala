@@ -3,6 +3,7 @@ package models.commands
 import java.util.UUID
 
 import models.CarInfo
+import services.SortKey
 
 import scala.collection.immutable
 
@@ -16,7 +17,7 @@ final case class UpdateCarCommand(car: CarInfo) extends Command
 
 final case class DeleteCarCommand(id: UUID) extends Command
 
-final case class ReadAllCommand(criteria: Option[String], desc: Option[Boolean]) extends Command
+final case class ReadAllCommand(sortBy: SortKey, desc: Boolean) extends Command
 
 sealed trait CommandResult
 

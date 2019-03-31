@@ -12,7 +12,7 @@ import org.mongodb.scala.connection.ClusterSettings
 import org.mongodb.scala.model.{Filters, IndexOptions, Indexes, Sorts}
 import org.mongodb.scala.{MongoClient, MongoClientSettings, MongoCollection, MongoDatabase}
 import play.api.{Configuration, Logging}
-import services.CarInfoRepository
+import services.{CarInfoRepository, SortKey}
 import services.mongo.MongoCarInfoRepository._
 
 import scala.collection.immutable
@@ -81,11 +81,11 @@ class MongoCarInfoRepository @Inject()(
     collection.findOneAndDelete(Filters.eq("id", id)).toFutureOption()
   }
 
-  override def getAll(criteria: String, desc: Boolean): Future[immutable.Seq[CarInfo]] = collectionF.flatMap {
+  override def getAll(sortBy: SortKey, desc: Boolean): Future[immutable.Seq[CarInfo]] = collectionF.flatMap {
     collection =>
       collection
         .find()
-        .sort(if (desc) Sorts.descending(criteria) else Sorts.ascending(criteria))
+        .sort(if (desc) Sorts.descending(sortBy.internalValue) else Sorts.ascending(sortBy.internalValue))
         .toFuture()
         .map(_.toList)
   }
