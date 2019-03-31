@@ -4,10 +4,10 @@
 ## Installing / Getting started
 
 First off all you need to install MongoDB.
-Follow manual with instruction: https://docs.mongodb.com/manual/administration/install-community/
+Follow manual with instruction: `https://docs.mongodb.com/manual/administration/install-community/`
 
-Once MongoDB installed, run it using followig command:
-```
+Once MongoDB installed, run it using following command:
+```shell
 sudo mongod
 ```
 
@@ -16,20 +16,20 @@ By default MongoDB starts on port 27017.
 ## Run
 
 To start application use:
-```
+```shell
 sbt run
 ```
 
 List of available endpoints:
 
-* POST    /public/v1/adverts
-* PUT     /public/v1/adverts
-* GET     /public/v1/adverts/:id
-* DELETE  /public/v1/adverts/:id
-* GET     /public/v1/adverts
+*   POST    /public/v1/adverts
+*   PUT     /public/v1/adverts
+*   GET     /public/v1/adverts/:id
+*   DELETE  /public/v1/adverts/:id
+*   GET     /public/v1/adverts
 
 > add car advert
-```
+```shell
 curl --request POST \
   --url http://localhost:9000/public/v1/adverts \
   --header 'content-type: application/json' \
@@ -43,14 +43,14 @@ curl --request POST \
 }'
 ```
 
->get car advert
-```
+> get car advert
+```shell
 curl --request GET \
   --url http://localhost:9000/public/v1/adverts/18f126d7-708b-4640-83f2-7916b9ad0531
 ```
 
->update car advert
-```
+> update car advert
+```shell
 curl --request PUT \
   --url http://localhost:9000/public/v1/adverts \
   --header 'content-type: application/json' \
@@ -63,14 +63,14 @@ curl --request PUT \
 }'
 ```
 
->get all car adverts
-```
+> get all car adverts
+```shell
 curl --request GET \
   --url 'http://localhost:9000/public/v1/adverts?sort=new&desc=true'\
 ```
 
->delete car advert
-```
+> delete car advert
+```shell
 curl --request DELETE \
   --url http://localhost:9000/public/v1/adverts/18f126d7-708b-4640-83f2-7916b9ad0531
 ```
