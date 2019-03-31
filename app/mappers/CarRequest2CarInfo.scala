@@ -5,8 +5,8 @@ import java.util.UUID
 
 import com.google.inject.Singleton
 import models.CarInfo
-import models.FuelType.FuelType
-import models.request.CarRequest
+import models.external.FuelType.FuelType
+import models.external.request.CarRequest
 
 @Singleton
 class CarRequest2CarInfo extends (CarRequest => CarInfo) {

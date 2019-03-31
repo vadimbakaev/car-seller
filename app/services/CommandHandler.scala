@@ -1,7 +1,7 @@
 package services
 
 import com.google.inject.{ImplementedBy, Inject, Singleton}
-import models.commands.{AddCarCommand, AddCarResult, Command, CommandResult, FailedResult}
+import models.commands._
 import play.api.Logging
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -25,6 +25,13 @@ class CommandHandlerImpl @Inject()(
         .create(car)
         .map {
           case Some(carInfo) => AddCarResult(carInfo.id.toString)
+          case _             => FailedResult
+        }
+    case GetCarCommand(id) =>
+      repository
+        .getById(id)
+        .map {
+          case Some(carInfo) => CarResult(carInfo)
           case _             => FailedResult
         }
   }

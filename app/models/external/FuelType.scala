@@ -1,4 +1,4 @@
-package models
+package models.external
 
 import play.api.libs.json.{Format, Json}
 

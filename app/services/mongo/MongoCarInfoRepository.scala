@@ -5,18 +5,18 @@ import java.util.UUID
 import com.google.inject.{Inject, Singleton}
 import com.mongodb.{ConnectionString, DuplicateKeyException, MongoWriteException}
 import models.CarInfo
-import org.bson.codecs.configuration.CodecProvider
 import org.bson.codecs.configuration.CodecRegistries.{fromProviders, fromRegistries}
-import org.mongodb.scala.bson.codecs.{DEFAULT_CODEC_REGISTRY, Macros}
+import org.mongodb.scala.bson.codecs.DEFAULT_CODEC_REGISTRY
+import org.mongodb.scala.bson.codecs.Macros._
 import org.mongodb.scala.connection.ClusterSettings
 import org.mongodb.scala.model.{Filters, IndexOptions, Indexes}
 import org.mongodb.scala.{MongoClient, MongoClientSettings, MongoCollection, MongoDatabase}
 import play.api.{Configuration, Logging}
 import services.CarInfoRepository
+import services.mongo.MongoCarInfoRepository._
 
 import scala.collection.immutable
 import scala.concurrent.{ExecutionContext, Future}
-import MongoCarInfoRepository._
 
 @Singleton
 class MongoCarInfoRepository @Inject()(
@@ -28,8 +28,6 @@ class MongoCarInfoRepository @Inject()(
   private lazy val mongodbURI     = config.get[String](Uri)
   private lazy val databaseName   = config.get[String](Db)
   private lazy val collectionName = config.get[String](CollectionName)
-
-  private val carCodecProvider: CodecProvider = Macros.createCodecProviderIgnoreNone[CarInfo]()
 
   private lazy val clusterSettings = ClusterSettings
     .builder()
@@ -45,7 +43,7 @@ class MongoCarInfoRepository @Inject()(
     .getDatabase(databaseName)
     .withCodecRegistry(
       fromRegistries(
-        fromProviders(carCodecProvider),
+        fromProviders(classOf[CarInfo]),
         DEFAULT_CODEC_REGISTRY
       )
     )
