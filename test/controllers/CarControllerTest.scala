@@ -33,7 +33,7 @@ class CarControllerTest
     val controller = new CarController(stubControllerComponents(), new CarRequest2CarInfo(), commandHandler)
 
     def executeGETRequest(body: JsValue): Future[Result] = {
-      val request: FakeRequest[JsValue] = FakeRequest(POST, "/public/v1/car")
+      val request: FakeRequest[JsValue] = FakeRequest(POST, "/public/v1/cars")
         .withBody(body)
         .withHeaders(HeaderNames.CONTENT_TYPE -> ContentTypes.JSON)
       controller.add.apply(request)
@@ -76,7 +76,7 @@ class CarControllerTest
       val addCarResponse: Future[Result] = executeGETRequest(body)
 
       status(addCarResponse) mustBe CREATED
-      header(HeaderNames.LOCATION, addCarResponse) mustBe Some(s"/public/v1/car/$id")
+      header(HeaderNames.LOCATION, addCarResponse) mustBe Some(s"/public/v1/cars/$id")
     }
   }
 }

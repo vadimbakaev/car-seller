@@ -28,7 +28,7 @@ class CarController @Inject()(
         invalid => Future(BadRequest(JsError.toJson(invalid))),
         valid =>
           commandHandler.handle(AddCarCommand(mapper(valid))).map {
-            case AddCarResult(id) => Created.withHeaders(HeaderNames.LOCATION -> s"/public/v1/car/$id")
+            case AddCarResult(id) => Created.withHeaders(HeaderNames.LOCATION -> s"/public/v1/cars/$id")
             case FailedResult     => Conflict
         }
       )
