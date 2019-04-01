@@ -13,13 +13,13 @@ import org.mongodb.scala.model.{Filters, IndexOptions, Indexes, Sorts}
 import org.mongodb.scala.{MongoClient, MongoClientSettings, MongoCollection, MongoDatabase}
 import play.api.{Configuration, Logging}
 import services.{CarAdvertsInfoRepository, SortKey}
-import services.mongo.MongoCarAdvertsInfoRepository._
+import services.mongo.MongoCarAdvertInfoRepository._
 
 import scala.collection.immutable
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class MongoCarAdvertsInfoRepository @Inject()(
+class MongoCarAdvertInfoRepository @Inject()(
     config: Configuration
 )(implicit ec: ExecutionContext)
     extends CarAdvertsInfoRepository
@@ -92,7 +92,7 @@ class MongoCarAdvertsInfoRepository @Inject()(
 
 }
 
-object MongoCarAdvertsInfoRepository {
+object MongoCarAdvertInfoRepository {
   val Uri            = "services.mongo.uri"
   val Db             = "services.mongo.database"
   val CollectionName = "services.mongo.collection"
