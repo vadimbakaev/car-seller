@@ -19,7 +19,6 @@ class StatusController @Inject()(cc: ControllerComponents)(implicit exec: Execut
   private val statusResponse: StatusResponse = StatusResponse(Instant.now(clock))
 
   def status: Action[AnyContent] = Action.async {
-    logger.debug("Get status")
     Future(Ok(Json.toJson(statusResponse)))
   }
 
