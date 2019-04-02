@@ -1,5 +1,8 @@
 
 # The Car Seller
+
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/54ed58afcf20477ca4cfcfa3492a4b1d)](https://app.codacy.com/app/vadimbakaev/car-seller?utm_source=github.com&utm_medium=referral&utm_content=vadimbakaev/car-seller&utm_campaign=Badge_Grade_Settings)
+
 > The service allows users to place new car adverts and view, modify and delete existing car adverts.
 
 ## Installing / Getting started
