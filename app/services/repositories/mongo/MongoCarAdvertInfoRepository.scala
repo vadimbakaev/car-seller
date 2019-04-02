@@ -1,10 +1,9 @@
-package services.mongo
+package services.repositories.mongo
 
 import java.util.UUID
 
 import com.google.inject.{Inject, Singleton}
 import com.mongodb.{ConnectionString, DuplicateKeyException, MongoWriteException}
-import models.CarAdvertInfo
 import org.bson.codecs.configuration.CodecRegistries.{fromProviders, fromRegistries}
 import org.mongodb.scala.bson.codecs.DEFAULT_CODEC_REGISTRY
 import org.mongodb.scala.bson.codecs.Macros._
@@ -12,14 +11,15 @@ import org.mongodb.scala.connection.ClusterSettings
 import org.mongodb.scala.model.{Filters, IndexOptions, Indexes, Sorts}
 import org.mongodb.scala.{MongoClient, MongoClientSettings, MongoCollection, MongoDatabase}
 import play.api.{Configuration, Logging}
-import services.{CarAdvertsInfoRepository, SortKey}
-import services.mongo.MongoCarAdvertsInfoRepository._
+import services.{CarAdvertInfo, SortKey}
+import services.repositories.mongo.MongoCarAdvertInfoRepository._
+import services.repositories.CarAdvertsInfoRepository
 
 import scala.collection.immutable
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class MongoCarAdvertsInfoRepository @Inject()(
+class MongoCarAdvertInfoRepository @Inject()(
     config: Configuration
 )(implicit ec: ExecutionContext)
     extends CarAdvertsInfoRepository
@@ -92,10 +92,10 @@ class MongoCarAdvertsInfoRepository @Inject()(
 
 }
 
-object MongoCarAdvertsInfoRepository {
-  val Uri            = "services.mongo.uri"
-  val Db             = "services.mongo.database"
-  val CollectionName = "services.mongo.collection"
+object MongoCarAdvertInfoRepository {
+  val Uri            = "services.repositories.mongo.uri"
+  val Db             = "services.repositories.mongo.database"
+  val CollectionName = "services.repositories.mongo.collection"
 
   val DuplicateKeyCode = "E11000"
 }

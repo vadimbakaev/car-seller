@@ -3,7 +3,12 @@ organization := "bakaev.vad"
 
 version := "1.0-SNAPSHOT"
 
-lazy val root = (project in file(".")).enablePlugins(PlayScala)
+lazy val root = (project in file("."))
+  .enablePlugins(PlayScala)
+  .configs(IntegrationTest)
+  .settings(Defaults.itSettings)
+
+scalaSource in IntegrationTest := baseDirectory.value / "/it"
 
 scalaVersion := "2.12.8"
 
@@ -24,12 +29,13 @@ libraryDependencies ++= {
     "com.beachape"           %% "enumeratum"           % Version.enumeratum,
     "org.mongodb.scala"      %% "mongo-scala-driver"   % Version.mongo,
     "com.typesafe.play"      %% "play-json"            % Version.playJson,
-    "org.mockito"            %% "mockito-scala"        % Version.mockitoScala % Test,
-    "org.scalatestplus.play" %% "scalatestplus-play"   % Version.scalaTest % Test
+    "org.mockito"            %% "mockito-scala"        % Version.mockitoScala % "it, test",
+    "org.scalatestplus.play" %% "scalatestplus-play"   % Version.scalaTest % "it, test"
   )
 }
 
 scalacOptions ++= Seq(
+  "-feature",
   "-unchecked",
   "-deprecation",
   "-encoding",

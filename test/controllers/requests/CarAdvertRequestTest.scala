@@ -1,11 +1,11 @@
-package models.external.request
+package controllers.requests
 
 import java.util.UUID
 
 import org.scalatestplus.play.PlaySpec
 import play.api.libs.json.Json
 import CarAdvertRequestTest._
-import models.external.FuelType
+import controllers.common.FuelType
 
 class CarAdvertRequestTest extends PlaySpec {
 

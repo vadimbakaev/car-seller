@@ -1,9 +1,9 @@
-package models.external.response
+package controllers.responses
 
 import java.time.Instant
 import java.util.UUID
 
-import models.external.FuelType
+import controllers.common.FuelType
 import play.api.libs.json.{Format, Json}
 
 final case class CarAdvertResponse(

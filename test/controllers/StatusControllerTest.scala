@@ -2,7 +2,7 @@ package controllers
 
 import java.time.{Clock, Instant, ZoneId}
 
-import models.external.response.StatusResponse
+import controllers.responses.StatusResponse
 import play.api.http.ContentTypes
 import play.api.libs.json.JsSuccess
 import play.api.mvc.Result
@@ -23,7 +23,7 @@ class StatusControllerTest extends ControllerBaseSpec {
   }
 
   "StatusController GET" should {
-    "return status response with application start instance" in new Fixture {
+    "return status responses with application start instance" in new Fixture {
       val statusResponse: Future[Result] = controller.status(FakeRequest(GET, "/status"))
 
       status(statusResponse) mustBe OK

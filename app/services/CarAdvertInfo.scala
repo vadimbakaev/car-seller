@@ -1,8 +1,19 @@
 package services
 
+import java.time.Instant
+import java.util.UUID
+
 import enumeratum._
 
 import scala.collection.immutable
+
+final case class CarAdvertInfo(id: UUID,
+                               title: String,
+                               fuel: String,
+                               price: Int,
+                               isNew: Boolean,
+                               mileage: Option[Int],
+                               registration: Option[Instant])
 
 sealed trait SortKey extends EnumEntry {
   val internalValue: String
