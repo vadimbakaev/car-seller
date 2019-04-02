@@ -5,7 +5,6 @@ import java.util.UUID
 
 import controllers.CarAdvertsControllerTest._
 import controllers.common.FuelType
-import controllers.requests.CarAdvertRequest
 import mappers.{CarAdvertInfo2CarAdvertResponse, CarAdvertRequest2CarAdvertInfo}
 import org.mockito.{ArgumentMatchersSugar, MockitoSugar}
 import org.scalatest.ParallelTestExecution
@@ -58,28 +57,24 @@ class CarAdvertsControllerTest
 
   "CarAdvertsController" should {
     "on add return Bad Request when requests is invalid, empty json" in new Fixture {
-      val body: JsValue                  = Json.obj()
-      val addCarResponse: Future[Result] = executePostRequest(body)
+      val addCarResponse: Future[Result] = executePostRequest(Json.obj())
 
       status(addCarResponse) mustBe BAD_REQUEST
     }
 
     "on add return Bad Request when requests is invalid" in new Fixture {
-      val body: JsValue                  = Json.toJson(InvalidCarRequest)
-      val addCarResponse: Future[Result] = executePostRequest(body)
+      val addCarResponse: Future[Result] = executePostRequest(InvalidCarRequest)
 
       status(addCarResponse) mustBe BAD_REQUEST
       contentAsJson(addCarResponse) mustBe Json.obj(
-        "obj.first registration" -> Json.arr(Json.obj("msg" -> Json.arr("error.path.missing"), "args" -> Json.arr())),
-        "obj.mileage"            -> Json.arr(Json.obj("msg" -> Json.arr("error.path.missing"), "args" -> Json.arr()))
+        "obj.fuel" -> Json.arr(Json.obj("msg" -> Json.arr("error.expected.validenumvalue"), "args" -> Json.arr()))
       )
     }
 
     "on add return Conflict when car already created" in new Fixture {
       when(carService.create(*)).thenReturn(Future.successful(None))
 
-      val body: JsValue                  = Json.toJson(ValidCarRequest)
-      val addCarResponse: Future[Result] = executePostRequest(body)
+      val addCarResponse: Future[Result] = executePostRequest(ValidCarRequest)
 
       status(addCarResponse) mustBe CONFLICT
 
@@ -89,8 +84,7 @@ class CarAdvertsControllerTest
     "on add return Created" in new Fixture {
       when(carService.create(*)).thenReturn(Future.successful(Some(AudiCarInfo)))
 
-      val body: JsValue                  = Json.toJson(ValidCarRequest)
-      val addCarResponse: Future[Result] = executePostRequest(body)
+      val addCarResponse: Future[Result] = executePostRequest(ValidCarRequest)
 
       status(addCarResponse) mustBe CREATED
       header(HeaderNames.LOCATION, addCarResponse) mustBe Some(s"/public/v1/adverts/$AudiId")
@@ -159,19 +153,25 @@ class CarAdvertsControllerTest
     "on update return Not Found carService doesn't return car" in new Fixture {
       when(carService.update(*)).thenReturn(Future.successful(None))
 
-      val body: JsValue                     = Json.toJson(ValidCarRequest)
-      val updateCarResponse: Future[Result] = executePutRequest(body)
+      val updateCarResponse: Future[Result] = executePutRequest(ValidCarRequest)
 
       status(updateCarResponse) mustBe NOT_FOUND
 
       verify(carService, times(1)).update(*)
     }
 
+    "on update return Bad Request when request is invalid" in new Fixture {
+      val updateCarResponse: Future[Result] = executePutRequest(InvalidCarRequest)
+
+      status(updateCarResponse) mustBe BAD_REQUEST
+
+      verify(carService, times(0)).update(*)
+    }
+
     "on update return No Content whe carService returns car" in new Fixture {
       when(carService.update(*)).thenReturn(Future.successful(Some(AudiCarInfo)))
 
-      val body: JsValue                     = Json.toJson(ValidCarRequest)
-      val updateCarResponse: Future[Result] = executePutRequest(body)
+      val updateCarResponse: Future[Result] = executePutRequest(ValidCarRequest)
 
       status(updateCarResponse) mustBe NO_CONTENT
 
@@ -206,10 +206,23 @@ class CarAdvertsControllerTest
 }
 
 object CarAdvertsControllerTest {
-  val ValidCarRequest: CarAdvertRequest =
-    CarAdvertRequest(UUID.randomUUID(), "Audi A4 Avant", FuelType.Diesel, 7000, `new` = true, None, None)
-  val InvalidCarRequest: CarAdvertRequest = ValidCarRequest.copy(`new` = false)
-  val AudiId: String                      = "d5449989-95b1-4b0b-a94f-eb653d1171d2"
+  val ValidCarRequest: JsValue = Json.obj(
+    "id"                 -> UUID.randomUUID(),
+    "title"              -> "Audi A4 Avant",
+    "fuel"               -> "D",
+    "price"              -> 7000,
+    "new"                -> false,
+    "mileage"            -> 99000,
+    "first registration" -> "2017-07-10T05:33:44.914Z"
+  )
+  val InvalidCarRequest: JsValue = Json.obj(
+    "id"    -> UUID.randomUUID(),
+    "title" -> "Audi A4 Avant",
+    "fuel"  -> "invalidFuel",
+    "price" -> 7000,
+    "new"   -> true
+  )
+  val AudiId: String = "d5449989-95b1-4b0b-a94f-eb653d1171d2"
   val AudiCarInfo: CarAdvertInfo = services.CarAdvertInfo(
     UUID.fromString(AudiId),
     "Audi A4 Avant",
