@@ -29,7 +29,7 @@ class MongoCarAdvertInfoRepositoryTest
   val databaseName   = "test-car-seller"
   val collectionName = "test-adverts"
 
-  override implicit val patienceConfig: PatienceConfig = PatienceConfig(3 seconds, 300 milliseconds)
+  override implicit val patienceConfig: PatienceConfig = PatienceConfig(5 seconds, 300 milliseconds)
 
   val database: MongoDatabase = {
     val clusterSettings: ClusterSettings = ClusterSettings
