@@ -18,6 +18,16 @@ class CarAdvertInfo2CarAdvertResponse extends (CarAdvertInfo => CarAdvertRespons
         mileage: Option[Int],
         registration: Option[Instant]
         ) =>
-      CarAdvertResponse(id, title, FuelType.values.find(_.toString == fuel).get, price, isNew, mileage, registration)
+      CarAdvertResponse(
+        id,
+        title,
+        FuelType.values
+          .find(_.toString == fuel)
+          .getOrElse(throw new IllegalArgumentException(s"Unsupported FuelType [$fuel]")),
+        price,
+        isNew,
+        mileage,
+        registration
+      )
   }
 }
