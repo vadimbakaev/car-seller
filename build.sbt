@@ -3,25 +3,39 @@ organization := "bakaev.vad"
 
 version := "1.0-SNAPSHOT"
 
-lazy val root = (project in file(".")).enablePlugins(PlayScala)
+lazy val root = (project in file("."))
+  .enablePlugins(PlayScala)
+  .configs(IntegrationTest)
+  .settings(Defaults.itSettings)
+
+scalaSource in IntegrationTest := baseDirectory.value / "/it"
 
 scalaVersion := "2.12.8"
 
 libraryDependencies ++= {
   object Version {
-    val scalaTest = "4.0.1"
-    val playJson = "2.7.2"
+    val scalaTest          = "4.0.1"
+    val playJson           = "2.7.2"
+    val mongo              = "2.6.0"
+    val mockitoScala       = "1.2.2"
+    val enumeratum         = "1.5.13"
+    val enumeratumPlayJson = "1.5.16"
   }
 
   Seq(
     ws,
     guice,
-    "com.typesafe.play" %% "play-json" % Version.playJson,
-    "org.scalatestplus.play" %% "scalatestplus-play" % Version.scalaTest % Test
+    "com.beachape"           %% "enumeratum-play-json" % Version.enumeratumPlayJson,
+    "com.beachape"           %% "enumeratum"           % Version.enumeratum,
+    "org.mongodb.scala"      %% "mongo-scala-driver"   % Version.mongo,
+    "com.typesafe.play"      %% "play-json"            % Version.playJson,
+    "org.mockito"            %% "mockito-scala"        % Version.mockitoScala % "it, test",
+    "org.scalatestplus.play" %% "scalatestplus-play"   % Version.scalaTest % "it, test"
   )
 }
 
 scalacOptions ++= Seq(
+  "-feature",
   "-unchecked",
   "-deprecation",
   "-encoding",

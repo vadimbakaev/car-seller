@@ -1,4 +1,4 @@
-package models.response
+package controllers.responses
 
 import java.time.Instant
 

@@ -5,3 +5,9 @@
 
 # An example controller showing a sample home page
 GET     /status                           controllers.StatusController.status
+
+POST    /public/v1/adverts                   controllers.CarAdvertsController.add
+PUT     /public/v1/adverts                   controllers.CarAdvertsController.update
+GET     /public/v1/adverts/:id               controllers.CarAdvertsController.get(id: String)
+DELETE  /public/v1/adverts/:id               controllers.CarAdvertsController.delete(id: String)
+GET     /public/v1/adverts                   controllers.CarAdvertsController.getAll(sort: String ?= "id", desc: Boolean ?= false)

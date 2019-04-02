@@ -3,7 +3,7 @@ package controllers
 import java.time.{Clock, Instant}
 
 import javax.inject._
-import models.response.StatusResponse
+import controllers.responses.StatusResponse
 import play.api.Logging
 import play.api.libs.json.Json
 import play.api.mvc._
@@ -19,7 +19,6 @@ class StatusController @Inject()(cc: ControllerComponents)(implicit exec: Execut
   private val statusResponse: StatusResponse = StatusResponse(Instant.now(clock))
 
   def status: Action[AnyContent] = Action.async {
-    logger.debug("Get status")
     Future(Ok(Json.toJson(statusResponse)))
   }
 
