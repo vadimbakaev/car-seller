@@ -1,9 +1,9 @@
-package models.external.request
+package controllers.requests
 
 import java.time.Instant
 import java.util.UUID
 
-import models.external.FuelType
+import controllers.common.FuelType
 import play.api.libs.functional.syntax._
 import play.api.libs.json.{JsPath, Reads, _}
 

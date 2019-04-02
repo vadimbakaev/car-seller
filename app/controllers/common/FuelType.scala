@@ -1,4 +1,4 @@
-package models.external
+package controllers.common
 
 import enumeratum._
 import play.api.libs.json._

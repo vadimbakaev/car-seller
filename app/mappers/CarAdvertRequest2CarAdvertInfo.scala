@@ -1,12 +1,12 @@
 package mappers
 
-import java.time.{Instant, ZonedDateTime}
+import java.time.Instant
 import java.util.UUID
 
 import com.google.inject.Singleton
-import models.CarAdvertInfo
-import models.external.FuelType
-import models.external.request.CarAdvertRequest
+import controllers.common.FuelType
+import controllers.requests.CarAdvertRequest
+import services.CarAdvertInfo
 
 @Singleton
 class CarAdvertRequest2CarAdvertInfo extends (CarAdvertRequest => CarAdvertInfo) {

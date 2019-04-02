@@ -1,8 +1,8 @@
-package services
+package services.repositories
 
 import com.google.inject.ImplementedBy
-import models.CarAdvertInfo
-import services.mongo.MongoCarAdvertInfoRepository
+import services.repositories.mongo.MongoCarAdvertInfoRepository
+import services.{CarAdvertInfo, SortKey}
 
 import scala.concurrent.Future
 

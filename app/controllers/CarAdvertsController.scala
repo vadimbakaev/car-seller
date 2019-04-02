@@ -4,8 +4,8 @@ import java.util.UUID
 
 import javax.inject._
 import mappers.{CarAdvertInfo2CarAdvertResponse, CarAdvertRequest2CarAdvertInfo}
-import models.external.request.CarAdvertRequest
-import models.external.response.AllCarAdvertsResponse
+import controllers.requests.CarAdvertRequest
+import controllers.responses.AllCarAdvertsResponse
 import play.api.Logging
 import play.api.libs.json.{JsError, JsValue, Json}
 import play.api.mvc._

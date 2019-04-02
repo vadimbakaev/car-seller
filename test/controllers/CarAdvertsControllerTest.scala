@@ -4,10 +4,9 @@ import java.time.ZonedDateTime
 import java.util.UUID
 
 import controllers.CarAdvertsControllerTest._
+import controllers.common.FuelType
+import controllers.requests.CarAdvertRequest
 import mappers.{CarAdvertInfo2CarAdvertResponse, CarAdvertRequest2CarAdvertInfo}
-import models.CarAdvertInfo
-import models.external.FuelType
-import models.external.request.CarAdvertRequest
 import org.mockito.{ArgumentMatchersSugar, MockitoSugar}
 import org.scalatest.ParallelTestExecution
 import org.scalatest.concurrent.ScalaFutures
@@ -17,7 +16,7 @@ import play.api.mvc.{AnyContent, Result}
 import play.api.test.FakeRequest
 import play.api.test.Helpers.{status, stubControllerComponents, _}
 import play.mvc.Http.HeaderNames
-import services.{CarAdvertsService, SortKey}
+import services.{CarAdvertInfo, CarAdvertsService, SortKey}
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -58,14 +57,14 @@ class CarAdvertsControllerTest
   }
 
   "CarAdvertsController" should {
-    "on add return Bad Request when request is invalid, empty json" in new Fixture {
+    "on add return Bad Request when requests is invalid, empty json" in new Fixture {
       val body: JsValue                  = Json.obj()
       val addCarResponse: Future[Result] = executePostRequest(body)
 
       status(addCarResponse) mustBe BAD_REQUEST
     }
 
-    "on add return Bad Request when request is invalid" in new Fixture {
+    "on add return Bad Request when requests is invalid" in new Fixture {
       val body: JsValue                  = Json.toJson(InvalidCarRequest)
       val addCarResponse: Future[Result] = executePostRequest(body)
 
@@ -211,7 +210,7 @@ object CarAdvertsControllerTest {
     CarAdvertRequest(UUID.randomUUID(), "Audi A4 Avant", FuelType.Diesel, 7000, `new` = true, None, None)
   val InvalidCarRequest: CarAdvertRequest = ValidCarRequest.copy(`new` = false)
   val AudiId: String                      = "d5449989-95b1-4b0b-a94f-eb653d1171d2"
-  val AudiCarInfo: CarAdvertInfo = CarAdvertInfo(
+  val AudiCarInfo: CarAdvertInfo = services.CarAdvertInfo(
     UUID.fromString(AudiId),
     "Audi A4 Avant",
     "Diesel",
@@ -222,7 +221,7 @@ object CarAdvertsControllerTest {
   )
   val OpelId: String                           = "18f126d7-708b-4640-83f2-7916b9ad0531"
   val RegistrationZonedDateTime: ZonedDateTime = ZonedDateTime.parse("2017-07-10T05:33:44.914Z")
-  val OpelCarInfo: CarAdvertInfo = CarAdvertInfo(
+  val OpelCarInfo: CarAdvertInfo = services.CarAdvertInfo(
     UUID.fromString(AudiId),
     "Opel Manta",
     "Gasoline",

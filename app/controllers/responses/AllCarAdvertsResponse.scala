@@ -1,4 +1,4 @@
-package models.external.response
+package controllers.responses
 
 import play.api.libs.json.{Format, Json}
 

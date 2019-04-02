@@ -35,6 +35,7 @@ libraryDependencies ++= {
 }
 
 scalacOptions ++= Seq(
+  "-feature",
   "-unchecked",
   "-deprecation",
   "-encoding",

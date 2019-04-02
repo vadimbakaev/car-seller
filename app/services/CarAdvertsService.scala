@@ -3,8 +3,8 @@ package services
 import java.util.UUID
 
 import com.google.inject.{ImplementedBy, Inject, Singleton}
-import models.CarAdvertInfo
 import play.api.Logging
+import services.repositories.CarAdvertsInfoRepository
 
 import scala.collection.immutable.Seq
 import scala.concurrent.{ExecutionContext, Future}

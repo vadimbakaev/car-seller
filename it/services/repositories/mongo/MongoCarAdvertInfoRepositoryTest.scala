@@ -1,18 +1,18 @@
-package services.mongo
+package services.repositories.mongo
 
 import java.time.Instant
 import java.util.UUID
 
 import com.mongodb.ConnectionString
-import models.CarAdvertInfo
 import org.mongodb.scala.bson.BsonDocument
 import org.mongodb.scala.connection.ClusterSettings
 import org.mongodb.scala.{Completed, MongoClient, MongoClientSettings, MongoDatabase}
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach, Matchers, WordSpecLike}
 import play.api.Configuration
-import services.{CarAdvertsInfoRepository, SortKey}
-import services.mongo.MongoCarAdvertInfoRepositoryTest._
+import services.{CarAdvertInfo, SortKey}
+import services.repositories.mongo.MongoCarAdvertInfoRepositoryTest._
+import services.repositories.CarAdvertsInfoRepository
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration._
@@ -45,9 +45,9 @@ class MongoCarAdvertInfoRepositoryTest
   }
 
   val config: Configuration = Configuration(
-    "services.mongo.uri"        -> mongodbURI,
-    "services.mongo.database"   -> databaseName,
-    "services.mongo.collection" -> collectionName
+    "services.repositories.mongo.uri"        -> mongodbURI,
+    "services.repositories.mongo.database"   -> databaseName,
+    "services.repositories.mongo.collection" -> collectionName
   )
   val repository: CarAdvertsInfoRepository = new MongoCarAdvertInfoRepository(config)
 
@@ -156,7 +156,7 @@ class MongoCarAdvertInfoRepositoryTest
 object MongoCarAdvertInfoRepositoryTest {
   val AudiA6Id: UUID = UUID.fromString("a647aecd-c247-4826-af86-252c0e13b8a0")
   val AudiId: UUID   = UUID.fromString("b647aecd-c247-4826-af86-252c0e13b8a0")
-  val AudiAdvertInfo: CarAdvertInfo = CarAdvertInfo(
+  val AudiAdvertInfo: CarAdvertInfo = services.CarAdvertInfo(
     AudiId,
     "Audi A4 Avant",
     "Diesel",
@@ -165,7 +165,7 @@ object MongoCarAdvertInfoRepositoryTest {
     None,
     None
   )
-  val UpdatedAudiAdvertInfo: CarAdvertInfo = CarAdvertInfo(
+  val UpdatedAudiAdvertInfo: CarAdvertInfo = services.CarAdvertInfo(
     AudiId,
     "Audi A6",
     "Gasoline",
