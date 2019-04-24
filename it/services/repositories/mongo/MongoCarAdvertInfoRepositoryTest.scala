@@ -39,7 +39,10 @@ class MongoCarAdvertInfoRepositoryTest
 
     val clientSettings: MongoClientSettings = MongoClientSettings
       .builder()
-      .applyToClusterSettings((b: ClusterSettings.Builder) => b.applySettings(clusterSettings))
+      .applyToClusterSettings((b: ClusterSettings.Builder) => {
+        b.applySettings(clusterSettings)
+        ()
+      })
       .build()
     MongoClient(clientSettings).getDatabase(databaseName)
   }
@@ -144,6 +147,7 @@ class MongoCarAdvertInfoRepositoryTest
       .toFuture()
       .futureValue
       .wasAcknowledged() shouldBe true
+    ()
   }
 
   override protected def afterAll(): Unit = {

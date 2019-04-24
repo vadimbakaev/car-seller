@@ -36,7 +36,10 @@ class MongoCarAdvertInfoRepository @Inject()(
 
   private lazy val clientSettings: MongoClientSettings = MongoClientSettings
     .builder()
-    .applyToClusterSettings((b: ClusterSettings.Builder) => b.applySettings(clusterSettings))
+    .applyToClusterSettings((b: ClusterSettings.Builder) => {
+      b.applySettings(clusterSettings)
+      ()
+    })
     .build()
 
   private lazy val database: MongoDatabase = MongoClient(clientSettings)
