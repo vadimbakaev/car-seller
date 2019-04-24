@@ -14,10 +14,10 @@ scalaVersion := "2.12.8"
 
 libraryDependencies ++= {
   object Version {
-    val scalaTest          = "4.0.1"
-    val playJson           = "2.7.2"
+    val scalaTest          = "4.0.2"
+    val playJson           = "2.7.3"
     val mongo              = "2.6.0"
-    val mockitoScala       = "1.2.2"
+    val mockitoScala       = "1.3.1"
     val enumeratum         = "1.5.13"
     val enumeratumPlayJson = "1.5.16"
   }
