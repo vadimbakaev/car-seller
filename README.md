@@ -29,6 +29,15 @@ To start application use:
 run
 ```
 
+## Docker
+
+```shell
+docker build -t car-sellar .
+
+docker run --rm --name mongo -d  --hostname mongo --expose 27017 mongo
+docker run --rm --name car-sellar -it -p 9000:9000 car-sellar
+```
+
 List of available endpoints:
 
 *   POST    /public/v1/adverts
